@@ -65,6 +65,34 @@ cause_1 = st.selectbox("Select Cause 1", causes, index=0)
 cause_2 = st.selectbox("Select Cause 2", causes, index=1)
 region = st.selectbox("Select Region", list(regions.keys()), index=2)
 year = st.slider("Select Year", min_value=int(df['Year'].min()), max_value=int(df['Year'].max()), value=2014)
+# Get the unique list of available countries from the dataset after name mapping
+available_countries = df['Country'].unique().tolist()
+
+# Define default countries with names after the name mapping
+default_countries = [country for country in [
+    "United States of America",  # Updated name after mapping
+    "Germany"  # This country was not mapped, so it stays as is
+] if country in available_countries]
+
+# If no default countries are available in the data, fallback to the first two countries
+if not default_countries:
+    default_countries = available_countries[:2]  # Fallback to the first two countries
+
+# Create the multiselect widget with the validated default values
+countries = st.multiselect(
+    "Select Countries for Line Plot", 
+    available_countries, 
+    default=default_countries
+)
+
+year_selection = alt.selection_single(
+    fields=['Year'], 
+    nearest=True, 
+    on='click', 
+    clear=False
+)
+
+
 
 
 # function that get projection
@@ -75,6 +103,18 @@ def get_projection(region):
 # merged_df
 merged_df[['Country', 'country-code', 'Year', cause_1, cause_2]] # mimicking what would be chosen in streamlit app
 merged_df = merged_df[merged_df['Year'] == year]
+
+# Filter data for map
+# Check if the selection is empty and default to 2014 if true
+selected_year = 2014  # Default year
+
+# If the selection is not empty, get the selected year
+if year_selection:
+    selected_year = year_selection['Year']
+
+# Filter the dataframe based on the selected year
+filtered_df = merged_df[merged_df['Year'] == selected_year]
+
 
 
 # defining background
@@ -99,7 +139,7 @@ chart_1 = chart_base.mark_geoshape().encode(
     color=rate_color_1,
     tooltip=[
         alt.Tooltip(f'{cause_1}:Q', title=f'{cause_1} Deaths', format=',.0f'),
-        alt.Tooltip('Country:N', title='Country:'),
+        alt.Tooltip('Country:N', title='Country:')
 
     ]
 ).transform_filter(selector).properties(title=f'Number of deaths caused by {cause_1} in {year}')
@@ -116,7 +156,17 @@ chart_2 = chart_base.mark_geoshape().encode(
     ]
 ).transform_filter(selector).properties(title=f'Number of deaths caused by {cause_2} in {year}')
 
+
+# Line plot for temporal data (deaths over years for selected countries)
+line_chart = alt.Chart(df[df['Country'].isin(countries)]).mark_line().encode(
+    x=alt.X('Year:O', title='Year'),
+    y=alt.Y(f'{cause_1}:Q', title=f'{cause_1} Deaths'),
+    color='Country:N',
+    tooltip=['Country:N', 'Year:O', f'{cause_1}:Q']
+).add_selection(year_selection).properties(title=f'{cause_1} Deaths Over Time', width=600, height=200)
+
 # combining charts with zoomable region settings
 chart = alt.vconcat(background + chart_1, background + chart_2).resolve_scale(color='independent')
 
+st.altair_chart(line_chart, use_container_width=True)
 st.altair_chart(chart, use_container_width=True)
