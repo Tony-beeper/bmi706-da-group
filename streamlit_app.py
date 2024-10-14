@@ -4,9 +4,6 @@ import matplotlib.pyplot as plt
 from vega_datasets import data
 import streamlit as st
 
-import folium
-from streamlit_folium import folium_static
-
 
 df = pd.read_csv('./data/cause_of_deaths.csv', index_col=False)
 country_df = pd.read_csv('https://raw.githubusercontent.com/hms-dbmi/bmi706-2022/main/cancer_data/country_codes.csv', dtype = {'conuntry-code': str})
@@ -65,6 +62,21 @@ cause_1 = st.selectbox("Select Cause 1", causes, index=0)
 cause_2 = st.selectbox("Select Cause 2", causes, index=1)
 region = st.selectbox("Select Region", list(regions.keys()), index=2)
 year = st.slider("Select Year", min_value=int(df['Year'].min()), max_value=int(df['Year'].max()), value=2014)
+year_selection = alt.selection_single(
+    fields=['Year'], 
+    nearest=True, 
+    on='click', 
+    clear=False
+)
+
+
+# For Donut chart
+# Select a specific country
+selected_country = st.selectbox("Select a Country for Donut Chart", df['Country'].unique())
+
+
+# For Line chart 
+# Create the multiselect widget with the validated default values
 # Get the unique list of available countries from the dataset after name mapping
 available_countries = df['Country'].unique().tolist()
 
@@ -78,18 +90,10 @@ default_countries = [country for country in [
 if not default_countries:
     default_countries = available_countries[:2]  # Fallback to the first two countries
 
-# Create the multiselect widget with the validated default values
 countries = st.multiselect(
     "Select Countries for Line Plot", 
     available_countries, 
     default=default_countries
-)
-
-year_selection = alt.selection_single(
-    fields=['Year'], 
-    nearest=True, 
-    on='click', 
-    clear=False
 )
 
 
@@ -113,7 +117,7 @@ if year_selection:
     selected_year = year_selection['Year']
 
 # Filter the dataframe based on the selected year
-filtered_df = merged_df[merged_df['Year'] == selected_year]
+
 
 
 
@@ -165,8 +169,30 @@ line_chart = alt.Chart(df[df['Country'].isin(countries)]).mark_line().encode(
     tooltip=['Country:N', 'Year:O', f'{cause_1}:Q']
 ).add_selection(year_selection).properties(title=f'{cause_1} Deaths Over Time', width=600, height=200)
 
+
+
+# Create a Donut Chart (Pie chart with a hole in the center)
+
+# Filter data for the selected country
+country_data = df[df['Country'] == selected_country].drop(columns=['Unnamed:_0', 'Code', 'Year', 'Country'])
+
+# Get the top 5-10 causes of death
+top_causes = country_data.sum().sort_values(ascending=False).head(5).reset_index()
+top_causes.columns = ['Cause', 'Deaths']
+
+donut_chart = alt.Chart(top_causes).mark_arc(innerRadius=50, outerRadius=100).encode(
+    theta=alt.Theta(field='Deaths', type='quantitative'),
+    color=alt.Color(field='Cause', type='nominal'),
+    tooltip=['Cause:N', 'Deaths:Q']
+).properties(
+    title=f'Top Causes of Death in {selected_country}',
+    width=400,  # Adjust as needed
+    height=400  # Adjust as needed
+)
+
 # combining charts with zoomable region settings
 chart = alt.vconcat(background + chart_1, background + chart_2).resolve_scale(color='independent')
 
 st.altair_chart(line_chart, use_container_width=True)
+st.altair_chart(donut_chart, use_container_width=True)
 st.altair_chart(chart, use_container_width=True)
