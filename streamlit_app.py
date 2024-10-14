@@ -4,9 +4,15 @@ import matplotlib.pyplot as plt
 from vega_datasets import data
 import streamlit as st
 
+import folium
+from streamlit_folium import folium_static
+
+
 df = pd.read_csv('./data/cause_of_deaths.csv', index_col=False)
 country_df = pd.read_csv('https://raw.githubusercontent.com/hms-dbmi/bmi706-2022/main/cancer_data/country_codes.csv', dtype = {'conuntry-code': str})
 country_df = country_df[['Country', 'country-code']]
+
+df.columns = df.columns.str.replace("'", "").str.replace(" ", "_")
 
 name_mapping = {
     'Bolivia': 'Bolivia (Plurinational State of)',
@@ -35,7 +41,7 @@ name_mapping = {
 
 df['Country'] = df['Country'].replace(name_mapping)
 merged_df = pd.merge(df, country_df, how='left', left_on='Country', right_on='Country')
-
+# merged_df = df
 source = alt.topo_feature(data.world_110m.url, 'countries')
 
 # defining basic parameters
@@ -53,10 +59,13 @@ regions = {
     'North America': {'center': [-100, 40], 'scale': 300},
     'South America': {'center': [-60, -15], 'scale': 300}
 }
-cause_1 = 'Meningitis'
-cause_2 = 'Nutritional Deficiencies'
-year = 2014
-region = 'Asia'
+# Select cause of death dynamically
+causes = df.columns[4:]  # Cause columns start from 4th index
+cause_1 = st.selectbox("Select Cause 1", causes, index=0)
+cause_2 = st.selectbox("Select Cause 2", causes, index=1)
+region = st.selectbox("Select Region", list(regions.keys()), index=2)
+year = st.slider("Select Year", min_value=int(df['Year'].min()), max_value=int(df['Year'].max()), value=2014)
+
 
 # function that get projection
 def get_projection(region):
@@ -89,8 +98,9 @@ rate_color_1 = alt.Color(field=cause_1, type='quantitative', scale=rate_scale_1)
 chart_1 = chart_base.mark_geoshape().encode(
     color=rate_color_1,
     tooltip=[
-        alt.Tooltip(f'{cause_1}:Q', title='Deaths:'),
-        alt.Tooltip('Country:N', title='Country:')
+        alt.Tooltip(f'{cause_1}:Q', title=f'{cause_1} Deaths', format=',.0f'),
+        alt.Tooltip('Country:N', title='Country:'),
+
     ]
 ).transform_filter(selector).properties(title=f'Number of deaths caused by {cause_1} in {year}')
 
@@ -101,7 +111,7 @@ rate_color_2 = alt.Color(field=cause_2, type='quantitative', scale=rate_scale_2)
 chart_2 = chart_base.mark_geoshape().encode(
     color=rate_color_2,
     tooltip=[
-        alt.Tooltip(f'{cause_2}:Q', title='Deaths:'),
+        alt.Tooltip(f'{cause_2}:Q', title=f'{cause_2} Deaths', format=',.0f'),
         alt.Tooltip('Country:N', title='Country:')
     ]
 ).transform_filter(selector).properties(title=f'Number of deaths caused by {cause_2} in {year}')
