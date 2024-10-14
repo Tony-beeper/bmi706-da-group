@@ -56,22 +56,17 @@ regions = {
     'North America': {'center': [-100, 40], 'scale': 300},
     'South America': {'center': [-60, -15], 'scale': 300}
 }
+
 # Select cause of death dynamically
 causes = df.columns[4:]  # Cause columns start from 4th index
 cause_1 = st.selectbox("Select Cause 1", causes, index=0)
 cause_2 = st.selectbox("Select Cause 2", causes, index=1)
+# Select Region for maps
 region = st.selectbox("Select Region", list(regions.keys()), index=2)
+# Select Year Slider for maps 
 year = st.slider("Select Year", min_value=int(df['Year'].min()), max_value=int(df['Year'].max()), value=2014)
-year_selection = alt.selection_single(
-    fields=['Year'], 
-    nearest=True, 
-    on='click', 
-    clear=False
-)
 
-
-# For Donut chart
-# Select a specific country
+# For Donut chart to select a specific country
 selected_country = st.selectbox("Select a Country for Donut Chart", df['Country'].unique())
 
 
@@ -96,7 +91,7 @@ countries = st.multiselect(
     default=default_countries
 )
 
-
+############################# Some Supporting functions for plots #####################################
 
 
 # function that get projection
@@ -107,19 +102,6 @@ def get_projection(region):
 # merged_df
 merged_df[['Country', 'country-code', 'Year', cause_1, cause_2]] # mimicking what would be chosen in streamlit app
 merged_df = merged_df[merged_df['Year'] == year]
-
-# Filter data for map
-# Check if the selection is empty and default to 2014 if true
-selected_year = 2014  # Default year
-
-# If the selection is not empty, get the selected year
-if year_selection:
-    selected_year = year_selection['Year']
-
-# Filter the dataframe based on the selected year
-
-
-
 
 # defining background
 background = alt.Chart(source).mark_geoshape(fill='#aaa', stroke='black').properties(
@@ -135,6 +117,7 @@ chart_base = alt.Chart(source).properties(width=width, height=height).project(
     lookup='id',
     from_=alt.LookupData(merged_df, 'country-code', ['Country', 'Year', cause_1, cause_2]))
 
+############################# Actual Maps and Chart functions ######################################
 # first map
 rate_scale_1 = alt.Scale(domain=[df[cause_1].min(), df[cause_1].max()], scheme='oranges')
 rate_color_1 = alt.Color(field=cause_1, type='quantitative', scale=rate_scale_1)
@@ -167,16 +150,15 @@ line_chart = alt.Chart(df[df['Country'].isin(countries)]).mark_line().encode(
     y=alt.Y(f'{cause_1}:Q', title=f'{cause_1} Deaths'),
     color='Country:N',
     tooltip=['Country:N', 'Year:O', f'{cause_1}:Q']
-).add_selection(year_selection).properties(title=f'{cause_1} Deaths Over Time', width=600, height=200)
+).properties(title=f'{cause_1} Deaths Over Time', width=600, height=200)
 
 
 
-# Create a Donut Chart (Pie chart with a hole in the center)
-
+# Donut Chart
 # Filter data for the selected country
 country_data = df[df['Country'] == selected_country].drop(columns=['Unnamed:_0', 'Code', 'Year', 'Country'])
 
-# Get the top 5-10 causes of death
+# Get the top 5 causes of death
 top_causes = country_data.sum().sort_values(ascending=False).head(5).reset_index()
 top_causes.columns = ['Cause', 'Deaths']
 
