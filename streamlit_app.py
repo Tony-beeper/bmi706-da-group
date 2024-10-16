@@ -67,14 +67,16 @@ project = 'equirectangular'
 st.markdown(
     """
     <style>
-    .main {
-        max-width: 2000px;
-        padding-left: 5%;
-        padding-right: 5%;
-    }
-    .dataframe-container {
-        overflow-x: auto;
-    }
+
+            .uploadedFile {{display: none}}
+            footer {{visibility: hidden;}}
+            .st-emotion-cache-1y4p8pa {
+                width: 100%;
+                padding: 1rem 1rem 1rem;
+                max-width: 1000rem;
+                margin-top: 50px
+
+            }
     </style>
     """,
     unsafe_allow_html=True
@@ -91,7 +93,7 @@ regions = {
     'South America': {'center': [-60, -15], 'scale': 300}
 }
 
-# Sidebar
+####################################################### Sidebar #######################################################
 with st.sidebar:
     # Select region
     selected_region = 'World' # Default
@@ -123,11 +125,18 @@ with st.sidebar:
 
     # Select specific country, can also be done by clicking on it
     country_options = ['All Countries'] + list(df['Country'].unique())  
-    selected_countries = st.multiselect('Select a country of interest', country_options, default='All Countries', max_selections=10)
+    selected_countries = st.multiselect('Countries for cause of death trend(line chart)', country_options, default='All Countries', max_selections=10)
     if selected_countries == ['All Countries']:
         selected_countries = list(df['Country'].unique())
     else:
         selected_countries = list(selected_countries)
+
+    # Select specific country, can also be done by clicking on it
+    selected_countries_donut = st.multiselect('Countries for cummulative cause of death(Donut chart)', country_options, default='All Countries', max_selections=10)
+    if selected_countries_donut == ['All Countries']:
+        selected_countries_donut = list(df['Country'].unique())
+    else:
+        selected_countries_donut = list(selected_countries_donut)
 
     # Display dropdown menus based on selection
     if 'initial_choice' not in st.session_state:
@@ -204,8 +213,8 @@ field_2 = clean_column_name(field_2)
 # Renaming columns in the merged df
 merged_df_selected = merged_df_selected.rename(columns=lambda x: clean_column_name(x))
 
-st.write("Filtered Table based on selections:")
-st.write(merged_df_selected)
+# st.write("Filtered Table based on selections:")
+# st.write(merged_df_selected)
 
 # Function for projection creation
 def get_projection(region):
@@ -252,42 +261,53 @@ chart_2 = chart_base.mark_geoshape().encode(
     ]
 ).transform_filter(selector).properties(title=title_2)
 
-col1, spacer1, col2 = st.columns([20, 0.1, 5])
-with col2:
-    color_scheme_1 = st.selectbox("Color Scheme for Map 1", color_schemes, index=0)
-    # Update color scheme
-    rate_scale_1 = alt.Scale(domain=[df[field_1].min(), df[field_1].max()], scheme=color_scheme_1)
-    rate_color_1 = alt.Color(field=field_1, type='quantitative', scale=rate_scale_1, legend=alt.Legend(title="Deaths"))
-    # Redraw first map with the selected color scheme
-    chart_1 = chart_base.mark_geoshape().encode(
-    color=rate_color_1,
-    tooltip=[
-        alt.Tooltip(f'{field_1}:Q', title=f'{field_1} Deaths'),
-        alt.Tooltip('Country:N', title='Country:')
-    ]
-    ).transform_filter(selector).properties(title=f'Number of deaths caused by {field_1} in {year}')
+cola, colb = st.columns(2)
 
-col3, spacer2, col4 = st.columns([20, 0.5, 5])
-with col4:
-    color_scheme_2 = st.selectbox("Color Scheme for Map 2", color_schemes, index=1)
-    # Update color scheme
-    rate_scale_2 = alt.Scale(domain=[merged_df_selected[field_2].min(), merged_df_selected[field_2].max()], scheme=color_scheme_2)
-    rate_color_2 = alt.Color(field=field_2, type='quantitative', scale=rate_scale_2, legend=alt.Legend(title="Deaths"))
-    # Redraw second map with the selected color scheme
-    chart_2 = chart_base.mark_geoshape().encode(
-    color=rate_color_2,
-    tooltip=[
-        alt.Tooltip(f'{field_2}:Q', title=f'{field_2} Deaths'),
-        alt.Tooltip('Country:N', title='Country:')
-    ]
-    ).transform_filter(selector).properties(title=f'Number of deaths caused by {field_2} in {year}')
+with cola:
+    col1, spacer1, col2 = st.columns([20, 0.1, 5])
+    with col2:
+        color_scheme_1 = st.selectbox("Color Scheme for Map 1", color_schemes, index=0)
+        # Update color scheme
+        rate_scale_1 = alt.Scale(domain=[df[field_1].min(), df[field_1].max()], scheme=color_scheme_1)
+        rate_color_1 = alt.Color(field=field_1, type='quantitative', scale=rate_scale_1, legend=alt.Legend(title="Deaths"))
+        # Redraw first map with the selected color scheme
+        chart_1 = chart_base.mark_geoshape().encode(
+        color=rate_color_1,
+        tooltip=[
+            alt.Tooltip(f'{field_1}:Q', title=f'{field_1} Deaths'),
+            alt.Tooltip('Country:N', title='Country:')
+        ]
+        ).transform_filter(selector).properties(title=f'Number of deaths caused by {field_1} in {year}')
+    with col1:
+        st.altair_chart(background + chart_1, use_container_width=True)
 
-with col1:
-    st.altair_chart(background + chart_1, use_container_width=True)
-with col3:
-    st.altair_chart(background + chart_2, use_container_width=True)
+with colb:
 
-############################# Line Chart ######################################
+    col3, spacer2, col4 = st.columns([20, 0.5, 5])
+
+    with col4:
+        color_scheme_2 = st.selectbox("Color Scheme for Map 2", color_schemes, index=1)
+        # Update color scheme
+        rate_scale_2 = alt.Scale(domain=[merged_df_selected[field_2].min(), merged_df_selected[field_2].max()], scheme=color_scheme_2)
+        rate_color_2 = alt.Color(field=field_2, type='quantitative', scale=rate_scale_2, legend=alt.Legend(title="Deaths"))
+        # Redraw second map with the selected color scheme
+        chart_2 = chart_base.mark_geoshape().encode(
+        color=rate_color_2,
+        tooltip=[
+            alt.Tooltip(f'{field_2}:Q', title=f'{field_2} Deaths'),
+            alt.Tooltip('Country:N', title='Country:')
+        ]
+        ).transform_filter(selector).properties(title=f'Number of deaths caused by {field_2} in {year}')
+
+
+    with col3:
+        st.altair_chart(background + chart_2, use_container_width=True)
+
+
+
+############################# Line Chart & Donut Chart ##################################################
+colc, cold = st.columns(2)
+
 merged_df = merged_df.rename(columns=lambda x: clean_column_name(x))
 
 if selected_countries == 'All Countries':
@@ -303,13 +323,29 @@ line_chart = alt.Chart(merged_df_selected).mark_line().encode(
     tooltip=['Country:N', 'Year:O', f'{field_1}:Q']
 ).properties(title=f'{field_1} Deaths Over Time', width=600, height=500)
 
-st.altair_chart(line_chart, use_container_width=True)
+
+
+with colc:
+    st.altair_chart(line_chart, use_container_width=True)
 
 # Donut Chart
-# Filter data for the selected country
-# country_data = df[df['Country'] == selected_country].drop(columns=['Unnamed:_0', 'Code', 'Year', 'Country'])
-# Get the top 5 causes of death
-# top_causes = country_data.sum().sort_values(ascending=False).head(5).reset_index()
-# top_causes.columns = ['Cause', 'Deaths']
-# donut_chart = alt.Chart(top_causes).mark_arc(innerRadius=50, outerRadius=100).encode(theta=alt.Theta(field='Deaths', type='quantitative'),
-# color=alt.Color(field='Cause', type='nominal'), tooltip=['Cause:N', 'Deaths:Q']).properties(title=f'Top Causes of Death in {selected_country}')
+# Filter data for the selected countries
+country_data = df[df['Country'].isin(selected_countries_donut)]
+
+# Select only numeric columns for death causes
+numeric_data = country_data.select_dtypes(include='number')
+
+# Get the top 5 causes of death (sum the numeric columns across the selected countries and sort)
+top_causes = numeric_data.sum().sort_values(ascending=False).head(5).reset_index()
+top_causes.columns = ['Cause', 'Deaths']
+
+# Create the donut chart
+donut_chart = alt.Chart(top_causes).mark_arc(innerRadius=50, outerRadius=100).encode(
+    theta=alt.Theta(field='Deaths', type='quantitative'),
+    color=alt.Color(field='Cause', type='nominal'),
+    tooltip=['Cause:N', 'Deaths:Q']
+).properties(title=f'Top accumulated causes of deaths in your selected countries')
+
+with cold:
+    # Display the chart
+    st.altair_chart(donut_chart, use_container_width=True)
