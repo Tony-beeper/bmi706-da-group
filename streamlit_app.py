@@ -100,8 +100,8 @@ continent_mapping = {'Albania': 'Europe','Andorra': 'Europe','Austria': 'Europe'
 source = alt.topo_feature(data.world_110m.url, 'countries')
 
 # Defining basic parameters
-width = 1000
-height  = 500
+width = 10000
+height  = 800
 project = 'equirectangular'
 
 st.markdown(
@@ -125,12 +125,13 @@ st.markdown(
 
 # Mapping regoins
 regions = {
-    'World': {'center': [0, 50], 'scale': 100},
-    'Africa': {'center': [15, 35], 'scale': 225},
-    'Europe': {'center': [10, 60], 'scale': 300},
-    'Asia': {'center': [100, 50], 'scale': 225},
+    'World': {'center': [0, 50], 'scale': 80},
+    'Africa': {'center': [15, -15], 'scale': 300},
+    'Europe': {'center': [10, 71], 'scale': 300},
+    'Asia': {'center': [100, 50], 'scale': 280},
     'North America': {'center': [-110, 50], 'scale': 250},
-    'South America': {'center': [-60, -15], 'scale': 300}
+    'South America': {'center': [-60, -30], 'scale': 300},
+    'Australia': {'center': [140, -40], 'scale': 450}
 }
 ####################################################### Sidebar #######################################################
 
@@ -146,6 +147,8 @@ with st.sidebar:
             selected_region = 'World'
         if st.button('Africa'):
             selected_region = 'Africa'
+        if st.button('Australia'):
+            selected_region = 'Australia'   
     with col2:
         if st.button('Europe'):
             selected_region = 'Europe'
