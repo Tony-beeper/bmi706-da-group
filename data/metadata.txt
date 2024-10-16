@@ -1,0 +1,22 @@
+categories = ['External_Causes', 'Infectious_Diseases',
+       'Maternal_and_Neonatal_Health', 'Non_Communicable_Diseases',
+       'Nutritional_and_Metabolic_Disorders', 'Substance_Use_Disorders',
+       'Violence_and_Conflict']
+indicators = ['Age_dependency_ratio', 'Annual_Population_growth',
+       'Annual_Urban_population_growth', 'Crude_Birth_rate', 'Fertility_rate',
+       'Infant_Mortality_rate', 'Life_expectancy_at_birth',
+       'Number_of_under_five_deaths', 'Percentage_of_Rural_population',
+       'Percentage_of_Urban_population', 'Population_ages_0_14',
+       'Population_ages_65_and_above', 'Total_Population']
+causes = ['Meningitis', 'Alzheimers_Disease_and_Other_Dementias',
+       'Parkinsons_Disease', 'Nutritional_Deficiencies', 'Malaria', 'Drowning',
+       'Interpersonal_Violence', 'Maternal_Disorders', 'HIV_AIDS',
+       'Drug_Use_Disorders', 'Tuberculosis', 'Cardiovascular_Diseases',
+       'Lower_Respiratory_Infections', 'Neonatal_Disorders',
+       'Alcohol_Use_Disorders', 'Self_harm', 'Exposure_to_Forces_of_Nature',
+       'Diarrheal_Diseases', 'Environmental_Heat_and_Cold_Exposure',
+       'Neoplasms', 'Conflict_and_Terrorism', 'Diabetes_Mellitus',
+       'Chronic_Kidney_Disease', 'Poisonings', 'Protein_Energy_Malnutrition',
+       'Road_Injuries', 'Chronic_Respiratory_Diseases',
+       'Cirrhosis_and_Other_Chronic_Liver_Diseases', 'Digestive_Diseases',
+       'Fire_Heat_and_Hot_Substances', 'Acute_Hepatitis']
