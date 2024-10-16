@@ -4,8 +4,9 @@ import matplotlib.pyplot as plt
 from vega_datasets import data
 import streamlit as st
 st.set_page_config(layout="wide")
-
+#pd.options.display.float_format = '{:.2f}'.format
 merged_df = pd.read_csv('./data/final_data.csv', index_col=False)
+merged_df = merged_df.round(3)
 #country_df = pd.read_csv('https://raw.githubusercontent.com/hms-dbmi/bmi706-2022/main/cancer_data/country_codes.csv', dtype = {'country-code': int})
 #country_df = country_df[['Country', 'country-code']]
 categories = ['External_Causes', 'Infectious_Diseases',
@@ -30,7 +31,24 @@ causes = ['Meningitis', 'Alzheimers_Disease_and_Other_Dementias',
        'Road_Injuries', 'Chronic_Respiratory_Diseases',
        'Cirrhosis_and_Other_Chronic_Liver_Diseases', 'Digestive_Diseases',
        'Fire_Heat_and_Hot_Substances', 'Acute_Hepatitis']
-
+continent_mapping = {'Albania': 'Europe','Andorra': 'Europe','Austria': 'Europe','Belarus': 'Europe','Belgium': 'Europe','Bosnia and Herzegovina': 'Europe',
+ 'Bulgaria': 'Europe','Croatia': 'Europe','Cyprus': 'Europe','Czechia': 'Europe','Denmark': 'Europe','Estonia': 'Europe','Finland': 'Europe',
+ 'France': 'Europe','Germany': 'Europe','Greece': 'Europe','Hungary': 'Europe','Iceland': 'Europe','Ireland': 'Europe','Italy': 'Europe','Latvia': 'Europe',
+ 'Lithuania': 'Europe', 'Luxembourg': 'Europe','Malta': 'Europe','Moldova, Republic of': 'Europe','Monaco': 'Europe','Montenegro': 'Europe','Netherlands': 'Europe',
+ 'North Macedonia': 'Europe','Norway': 'Europe','Poland': 'Europe','Portugal': 'Europe','Romania': 'Europe','San Marino': 'Europe','Serbia': 'Europe',
+ 'Slovakia': 'Europe','Slovenia': 'Europe','Spain': 'Europe','Sweden': 'Europe','Switzerland': 'Europe','Ukraine': 'Europe','United Kingdom of Great Britain and Northern Ireland': 'Europe',
+ 'Afghanistan': 'Asia','Armenia': 'Asia','Azerbaijan': 'Asia','Bahrain': 'Asia','Bangladesh': 'Asia','Bhutan': 'Asia','Brunei Darussalam': 'Asia','Cambodia': 'Asia',
+ 'China': 'Asia','Georgia': 'Asia','India': 'Asia','Indonesia': 'Asia','Iran (Islamic Republic of)': 'Asia','Iraq': 'Asia','Israel': 'Asia','Japan': 'Asia',
+ 'Jordan': 'Asia','Kazakhstan': 'Asia','Kuwait': 'Asia','Kyrgyzstan': 'Asia',"Lao People's Democratic Republic": 'Asia','Lebanon': 'Asia','Malaysia': 'Asia',
+ 'Maldives': 'Asia','Mongolia': 'Asia','Myanmar': 'Asia','Nepal': 'Asia','Oman': 'Asia','Pakistan': 'Asia','Philippines': 'Asia','Qatar': 'Asia','Saudi Arabia': 'Asia','Singapore': 'Asia','Sri Lanka': 'Asia','Syrian Arab Republic': 'Asia','Tajikistan': 'Asia','Thailand': 'Asia','Timor-Leste': 'Asia','Turkey': 'Asia','Turkmenistan': 'Asia','United Arab Emirates': 'Asia','Uzbekistan': 'Asia','Viet Nam': 'Asia','Yemen': 'Asia','Algeria': 'Africa','Angola': 'Africa','Benin': 'Africa','Botswana': 'Africa','Burkina Faso': 'Africa','Burundi': 'Africa','Cabo Verde': 'Africa','Cameroon': 'Africa','Central African Republic': 'Africa','Chad': 'Africa','Comoros': 'Africa','Congo': 'Africa','Congo, Democratic Republic of the': 'Africa',"Côte d'Ivoire": 'Africa','Djibouti': 'Africa','Egypt': 'Africa','Equatorial Guinea': 'Africa','Eritrea': 'Africa','Eswatini': 'Africa','Ethiopia': 'Africa','Gabon': 'Africa','Gambia': 'Africa','Ghana': 'Africa','Guinea': 'Africa','Guinea-Bissau': 'Africa','Kenya': 'Africa','Lesotho': 'Africa','Liberia': 'Africa','Libya': 'Africa','Madagascar': 'Africa','Malawi': 'Africa','Mali': 'Africa','Mauritania': 'Africa','Mauritius': 'Africa','Morocco': 'Africa','Mozambique': 'Africa','Namibia': 'Africa','Niger': 'Africa','Nigeria': 'Africa','Rwanda': 'Africa','Sao Tome and Principe': 'Africa','Senegal': 'Africa','Seychelles': 'Africa','Sierra Leone': 'Africa','Somalia': 'Africa','South Africa': 'Africa','South Sudan': 'Africa','Sudan': 'Africa',
+ 'Tanzania, United Republic of': 'Africa','Togo': 'Africa','Tunisia': 'Africa','Uganda': 'Africa',
+ 'Zambia': 'Africa','Zimbabwe': 'Africa',
+ 'Antigua and Barbuda': 'North America','Bahamas': 'North America','Barbados': 'North America','Belize': 'North America','Bermuda': 'North America','Canada': 'North America',
+ 'Costa Rica': 'North America','Cuba': 'North America','Dominica': 'North America','Dominican Republic': 'North America','El Salvador': 'North America','Grenada': 'North America','Guatemala': 'North America',
+ 'Haiti': 'North America','Honduras': 'North America','Jamaica': 'North America','Mexico': 'North America','Nicaragua': 'North America','Panama': 'North America','Puerto Rico': 'North America','Saint Kitts and Nevis': 'North America','Saint Lucia': 'North America','Saint Vincent and the Grenadines': 'North America',
+ 'Trinidad and Tobago': 'North America','United States of America': 'North America',
+ 'Virgin Islands (U.S.)': 'North America','Argentina': 'South America','Bolivia (Plurinational State of)': 'South America','Brazil': 'South America','Chile': 'South America','Colombia': 'South America','Ecuador': 'South America','Guyana': 'South America','Paraguay': 'South America','Peru': 'South America','Suriname': 'South America','Uruguay': 'South America',
+ 'Venezuela': 'South America','Australia': 'Australia','Fiji': 'Australia','Kiribati': 'Australia','Marshall Islands': 'Australia','Micronesia (Federated States of)': 'Australia','Nauru': 'Australia','New Zealand': 'Australia','Palau': 'Australia','Papua New Guinea': 'Australia','Samoa': 'Australia','Solomon Islands': 'Australia','Tonga': 'Australia','Tuvalu': 'Australia','Vanuatu': 'Australia'}
 # Mapping for countries with names abcent in the initial dataset
 # #name_mapping = {
 #     'Bolivia': 'Bolivia (Plurinational State of)',
@@ -154,11 +172,11 @@ with st.sidebar:
         selected_countries = list(selected_countries)
 
     # Select specific country, can also be done by clicking on it
-    selected_countries_donut = st.multiselect('Countries for cummulative cause of death(Donut chart)', country_options, default='All Countries', max_selections=10)
-    if selected_countries_donut == ['All Countries']:
-        selected_countries_donut = list(merged_df['Country Name'].unique())
-    else:
-        selected_countries_donut = list(selected_countries_donut)
+    # selected_countries_donut = st.multiselect('Countries for cummulative cause of death(Donut chart)', country_options, default='All Countries', max_selections=10)
+    # if selected_countries_donut == ['All Countries']:
+    #     selected_countries_donut = list(merged_df['Country Name'].unique())
+    # else:
+    #     selected_countries_donut = list(selected_countries_donut)
 
     # Display dropdown menus based on selection
     if 'initial_choice' not in st.session_state:
@@ -220,7 +238,7 @@ with st.sidebar:
 color_schemes = ['oranges', 'blues', 'greens', 'reds', 'purples', 'viridis', 'plasma', 'inferno']
 
 # Defining filtered data
-if selected_countries == 'All Countries':
+if selected_countries == list(merged_df['Country Name'].unique()):
     merged_df_selected = merged_df[merged_df['year'] == year][['Country Name', 'year', 'Country Code', field_1, field_2]]
 else:
     merged_df_selected = merged_df[(merged_df['year'] == year) & (merged_df['Country Name'].isin(selected_countries))][['Country Name', 'year', 'Country Code', field_1, field_2]]
@@ -265,7 +283,7 @@ rate_color_1 = alt.Color(field=field_1, type='quantitative', scale=rate_scale_1)
 chart_1 = chart_base.mark_geoshape().encode(
     color=rate_color_1,
     tooltip=[
-        alt.Tooltip(f'{field_1}:Q', title=f'{field_1} Deaths'),
+        alt.Tooltip(f'{field_1}:Q', title=f'{field_1} Deaths per 100,000'),
         alt.Tooltip('Country Name:N', title='Country:')
 
     ]
@@ -278,7 +296,7 @@ rate_color_2 = alt.Color(field=field_2, type='quantitative', scale=rate_scale_2)
 chart_2 = chart_base.mark_geoshape().encode(
     color=rate_color_2,
     tooltip=[
-        alt.Tooltip(f'{field_2}:Q', title=f'{field_2} Deaths'),
+        alt.Tooltip(f'{field_2}:Q', title=f'{field_2} Deaths per 100,000'),
         alt.Tooltip('Country Name:N', title='Country:')
     ]
 ).transform_filter(selector).properties(title=title_2)
@@ -291,15 +309,15 @@ with cola:
         color_scheme_1 = st.selectbox("Color Scheme for Map 1", color_schemes, index=0)
         # Update color scheme
         rate_scale_1 = alt.Scale(domain=[merged_df[field_1].min(), merged_df[field_1].max()], scheme=color_scheme_1)
-        rate_color_1 = alt.Color(field=field_1, type='quantitative', scale=rate_scale_1, legend=alt.Legend(title="Deaths"))
+        rate_color_1 = alt.Color(field=field_1, type='quantitative', scale=rate_scale_1, legend=alt.Legend(title="Deaths per 100,000"))
         # Redraw first map with the selected color scheme
         chart_1 = chart_base.mark_geoshape().encode(
         color=rate_color_1,
         tooltip=[
-            alt.Tooltip(f'{field_1}:Q', title=f'{field_1} Deaths'),
+            alt.Tooltip(f'{field_1}:Q', title=f'{field_1} Deaths per 100,000'),
             alt.Tooltip('Country Name:N', title='Country:')
         ]
-        ).transform_filter(selector).properties(title=f'Number of deaths caused by {field_1} in {year}')
+        ).transform_filter(selector).properties(title=f'Number of deaths per 100,000 caused by {field_1} in {year}')
     with col1:
         st.altair_chart(background + chart_1, use_container_width=True)
 
@@ -311,15 +329,15 @@ with colb:
         color_scheme_2 = st.selectbox("Color Scheme for Map 2", color_schemes, index=1)
         # Update color scheme
         rate_scale_2 = alt.Scale(domain=[merged_df_selected[field_2].min(), merged_df_selected[field_2].max()], scheme=color_scheme_2)
-        rate_color_2 = alt.Color(field=field_2, type='quantitative', scale=rate_scale_2, legend=alt.Legend(title="Deaths"))
+        rate_color_2 = alt.Color(field=field_2, type='quantitative', scale=rate_scale_2, legend=alt.Legend(title="Deaths per 100,000"))
         # Redraw second map with the selected color scheme
         chart_2 = chart_base.mark_geoshape().encode(
         color=rate_color_2,
         tooltip=[
-            alt.Tooltip(f'{field_2}:Q', title=f'{field_2} Deaths'),
+            alt.Tooltip(f'{field_2}:Q', title=f'{field_2} Deaths per 100,000'),
             alt.Tooltip('Country Name:N', title='Country:')
         ]
-        ).transform_filter(selector).properties(title=f'Number of deaths caused by {field_2} in {year}')
+        ).transform_filter(selector).properties(title=f'Number of deaths per 100,000 caused by {field_2} in {year}')
 
 
     with col3:
@@ -329,11 +347,18 @@ with colb:
 
 ############################# Line Chart & Donut Chart ##################################################
 colc, cold = st.columns([20, 10])
-
 #merged_df = merged_df.rename(columns=lambda x: clean_column_name(x))
 
-if selected_countries == 'All Countries':
-    merged_df_selected = merged_df[['Country Name', 'year', 'Country Code', field_1, field_2]]
+if selected_countries == list(merged_df['Country Name'].unique()):
+    merged_df_selected = merged_df[['Country Name', 'year', 'Country Code', 'Total_Population', field_1, field_2]]
+    merged_df_selected['Continent'] = merged_df_selected['Country Name'].map(continent_mapping)
+    for field in [field_1,field_2]:
+        merged_df_selected[field] = merged_df_selected[field]*merged_df_selected['Total_Population']/100000
+    summed_df = merged_df_selected.groupby(by = ['Continent', 'year']).sum().reset_index()
+    for field in [field_1,field_2]:
+        summed_df[field] = 100000*summed_df[field]/summed_df['Total_Population']
+    merged_df_selected = summed_df
+    merged_df_selected['Country Name'] = merged_df_selected['Continent']
 else:
     merged_df_selected = merged_df[merged_df['Country Name'].isin(selected_countries)][['Country Name', 'year', 'Country Code', field_1, field_2]]
     
@@ -362,7 +387,7 @@ prediction_data = base.transform_filter(
 
 # Combine both layers
 line_chart = alt.layer(current_data, prediction_data).properties(
-    title=f'{field_1} Deaths Over Time',
+    title=f'{field_1} Deaths per 100,000Over Time ',
     width=600,
     height=500
 )
@@ -370,14 +395,14 @@ line_chart = alt.layer(current_data, prediction_data).properties(
 # Creating the legend for line styles (Current Data and Prediction)
 legend_data = pd.DataFrame({
     'label': ['', ''],
-    'Line Representation': ['Collected Data', 'Arima Model Prediction'],
+    'Key': ['Arima Model Prediction','Collected Data'],
     'y': [1, 2]  # Dummy y-values for positioning
 })
 
 legend_chart = alt.Chart(legend_data).mark_line().encode(
     y=alt.Y('y:O', axis=None),  # Hides the axis
     x=alt.value(0),  # Position the legend lines horizontally
-    strokeDash='Line Representation:N',
+    strokeDash='Key:N',
     color=alt.value('red'),
     size=alt.value(2)
 ).properties(
@@ -400,21 +425,24 @@ with colc:
 
 # Donut Chart
 # Filter data for the selected countries
-country_data = merged_df[merged_df['Country Name'].isin(selected_countries_donut)]
-
+country_data = merged_df[merged_df['Country Name'].isin(selected_countries)]
+country_data = country_data.loc[country_data[country_data['year']==year].index, :]
+for category in categories:
+    country_data[category] = country_data[category]*country_data['Total_Population']/100000
 # Select only numeric columns for death causes
-numeric_data = country_data[categories]
+numeric_data = country_data.sum()
+numeric_data = numeric_data[categories]*100000/numeric_data['Total_Population']
 
 # Get the top 5 causes of death (sum the numeric columns across the selected countries and sort)
-top_causes = numeric_data.sum().sort_values(ascending=False).head(7).reset_index()
+top_causes = numeric_data.sort_values(ascending=False).head(7).reset_index()
 top_causes.columns = ['Cause', 'Deaths']
 
 # Create the donut chart
 donut_chart = alt.Chart(top_causes).mark_arc(innerRadius=50, outerRadius=100).encode(
     theta=alt.Theta(field='Deaths', type='quantitative'),
-    color=alt.Color(field='Cause', type='nominal'),
-    tooltip=['Cause:N', 'Deaths:Q']
-).properties(title=f'Top accumulated causes of deaths in your selected countries')
+    color=alt.Color(field='Cause', type='nominal', title = 'Category'),
+    tooltip=[alt.Tooltip('Cause:N', title = 'Category'), alt.Tooltip('Deaths:Q', title='Deaths per 100,000')]
+).properties(title=f'Category-wise distribution of deaths per 100,000 for selected countries in ' + str(year))
 
 with cold:
     # Display the chart
