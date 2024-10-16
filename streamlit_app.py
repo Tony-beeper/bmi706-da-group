@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from vega_datasets import data
 import streamlit as st
-
+st.set_page_config(layout="wide")
 
 df = pd.read_csv('./data/cause_of_deaths.csv', index_col=False)
 country_df = pd.read_csv('https://raw.githubusercontent.com/hms-dbmi/bmi706-2022/main/cancer_data/country_codes.csv', dtype = {'country-code': int})
@@ -92,7 +92,6 @@ regions = {
     'North America': {'center': [-110, 50], 'scale': 250},
     'South America': {'center': [-60, -15], 'scale': 300}
 }
-
 ####################################################### Sidebar #######################################################
 with st.sidebar:
     # Select region
