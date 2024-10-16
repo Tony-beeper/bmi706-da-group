@@ -135,93 +135,58 @@ with st.sidebar:
     if 'reset' not in st.session_state:
         st.session_state.reset = False
 
-    # Reset button functionality
-    st.write(f'Select comparison type')
-    if st.sidebar.button('Reset'):
-        st.session_state.initial_choice = None
-        st.session_state.reset = True
-    if st.session_state.reset:
-        st.session_state.reset = False
-
-    if st.session_state.reset:
-        st.session_state.reset = False
-
     # Initial choice: Type of comparison
-    if st.session_state.initial_choice is None:
-        st.session_state.initial_choice = st.sidebar.radio('', 
-            [
-                'Causes of deaths comparison', 
-                'Categories of causes of deaths comparison', 
-                'Cause of deaths vs socioeconomic factor comparison', 
-                'Category of causes of deaths vs socioeconomic factor comparison'
-            ]
-        )
-    
-    if st.session_state.initial_choice:
-        st.sidebar.write(f"**You selected:** {st.session_state.initial_choice}")
+    initial_choice = st.sidebar.radio(
+    "Choose comparison type:",
+    [
+        'Causes of deaths comparison', 
+        'Categories of causes of deaths comparison', 
+        'Cause of deaths vs socioeconomic factor comparison', 
+        'Category of causes of deaths vs socioeconomic factor comparison'
+    ]
+    )
 
-    # Display options based on the initial choice
-    if st.session_state.initial_choice == 'Causes of deaths comparison':
+    # Display options based on the selected choice
+    if initial_choice == 'Causes of deaths comparison':
         st.sidebar.write('Select causes of death to compare:')
         cause_1 = st.sidebar.selectbox('Select first cause', causes, index=0)
         cause_2 = st.sidebar.selectbox('Select second cause', causes, index=1)
         st.write(f'You chose to compare: {cause_1} and {cause_2}')
+        title_1 = f"Number of deaths caused by {cause_1} in {year}"
+        title_2 = f"Number of deaths caused by {cause_2} in {year}"
+        field_1, field_2 = cause_1, cause_2
 
-    elif st.session_state.initial_choice == 'Categories of causes of deaths comparison':
+    elif initial_choice == 'Categories of causes of deaths comparison':
         st.sidebar.write('Select categories to compare:')
         category_1 = st.sidebar.selectbox('Select first category', categories, index=0)
         category_2 = st.sidebar.selectbox('Select second category', categories, index=1)
         st.write(f'You chose to compare categories: {category_1} and {category_2}')
+        title_1 = f"Number of deaths in {category_1} in {year}"
+        title_2 = f"Number of deaths in {category_2} in {year}"
+        field_1, field_2 = category_1, category_2
 
-    elif st.session_state.initial_choice == 'Cause of deaths vs socioeconomic factor comparison':
+    elif initial_choice == 'Cause of deaths vs socioeconomic factor comparison':
         st.sidebar.write('Select cause of death and socioeconomic factor to compare:')
         cause = st.sidebar.selectbox('Select cause of death', causes)
         socioeconomic_factor = st.sidebar.selectbox('Select socioeconomic factor', socioeconomic_factors)
         st.write(f'You chose to compare: {cause} with {socioeconomic_factor}')
+        title_1 = f"{cause} Deaths vs Socioeconomic Factor in {year}"
+        title_2 = f"Socioeconomic Factor in {year}"
+        field_1, field_2 = cause, socioeconomic_factor
 
-    elif st.session_state.initial_choice == 'Category of causes of deaths vs socioeconomic factor comparison':
+    elif initial_choice == 'Category of causes of deaths vs socioeconomic factor comparison':
         st.sidebar.write('Select category and socioeconomic factor to compare:')
         category = st.sidebar.selectbox('Select category', categories)
         socioeconomic_factor = st.sidebar.selectbox('Select socioeconomic factor', socioeconomic_factors)
         st.write(f'You chose to compare category: {category} with {socioeconomic_factor}')
-
-    # For Line chart 
-    # Create the multiselect widget with the validated default values
-    # Get the unique list of available countries from the dataset after name mapping
-    available_countries = df['Country'].unique().tolist()
-
-    # Define default countries with names after the name mapping
-    default_countries = [country for country in [
-        'United States of America',  # Updated name after mapping
-        'Germany'  # This country was not mapped, so it stays as is
-    ] if country in available_countries]
-
-    # If no default countries are available in the data, fallback to the first two countries
-    if not default_countries:
-        default_countries = available_countries[:2]  # Fallback to the first two countries
+        title_1 = f"{category} Deaths vs Socioeconomic Factor in {year}"
+        title_2 = f"Socioeconomic Factor in {year}"
+        field_1, field_2 = category, socioeconomic_factor
 
 ############################# Some Supporting functions for plots #####################################
 
 # Choosing color schema
 color_schemes = ['oranges', 'blues', 'greens', 'reds', 'purples', 'viridis', 'plasma', 'inferno']
-
-# Titles and fields according to the chosen selection
-if st.session_state.initial_choice == 'Causes of deaths comparison':
-    title_1 = f"Number of deaths caused by {cause_1} in {year}"
-    title_2 = f"Number of deaths caused by {cause_2} in {year}"
-    field_1, field_2 = cause_1, cause_2
-elif st.session_state.initial_choice == 'Categories of causes of deaths comparison':
-    title_1 = f"Number of deaths in {category_1} in {year}"
-    title_2 = f"Number of deaths in {category_2} in {year}"
-    field_1, field_2 = category_1, category_2
-elif st.session_state.initial_choice == 'Cause of deaths vs socioeconomic factor comparison':
-    title_1 = f"{cause_1} Deaths vs Socioeconomic Factor in {year}"
-    title_2 = "Socioeconomic Factor in {year}" 
-    field_1, field_2 = cause, socioeconomic_factor
-elif st.session_state.initial_choice == 'Category of causes of deaths vs socioeconomic factor comparison':
-    title_1 = f"{category_1} Deaths vs Socioeconomic Factor in {year}"
-    title_2 = "Socioeconomic Factor in {year}"  # Placeholder for a socioeconomic field
-    field_1, field_2 = category, socioeconomic_factor
 
 # Defining filtered data
 if selected_countries == 'All Countries':
@@ -273,7 +238,7 @@ chart_1 = chart_base.mark_geoshape().encode(
         alt.Tooltip('Country:N', title='Country:')
 
     ]
-).transform_filter(selector).properties(title=f'Number of deaths caused by {field_1} in {year}')
+).transform_filter(selector).properties(title=title_1)
 
 # Second map
 rate_scale_2 = alt.Scale(domain=[merged_df_selected[field_2].min(), merged_df_selected[field_2].max()], scheme='blues')
@@ -285,14 +250,14 @@ chart_2 = chart_base.mark_geoshape().encode(
         alt.Tooltip(f'{field_2}:Q', title=f'{field_2} Deaths'),
         alt.Tooltip('Country:N', title='Country:')
     ]
-).transform_filter(selector).properties(title=f'Number of deaths caused by {field_2} in {year}')
+).transform_filter(selector).properties(title=title_2)
 
-col1, spacer1, col2 = st.columns([18, 0.1, 6])
+col1, spacer1, col2 = st.columns([20, 0.1, 5])
 with col2:
     color_scheme_1 = st.selectbox("Color Scheme for Map 1", color_schemes, index=0)
     # Update color scheme
     rate_scale_1 = alt.Scale(domain=[df[field_1].min(), df[field_1].max()], scheme=color_scheme_1)
-    rate_color_1 = alt.Color(field=field_1, type='quantitative', scale=rate_scale_1)
+    rate_color_1 = alt.Color(field=field_1, type='quantitative', scale=rate_scale_1, legend=alt.Legend(title="Deaths"))
     # Redraw first map with the selected color scheme
     chart_1 = chart_base.mark_geoshape().encode(
     color=rate_color_1,
@@ -302,12 +267,12 @@ with col2:
     ]
     ).transform_filter(selector).properties(title=f'Number of deaths caused by {field_1} in {year}')
 
-col3, spacer2, col4 = st.columns([18, 0.1, 6])
+col3, spacer2, col4 = st.columns([20, 0.5, 5])
 with col4:
     color_scheme_2 = st.selectbox("Color Scheme for Map 2", color_schemes, index=1)
     # Update color scheme
     rate_scale_2 = alt.Scale(domain=[merged_df_selected[field_2].min(), merged_df_selected[field_2].max()], scheme=color_scheme_2)
-    rate_color_2 = alt.Color(field=field_2, type='quantitative', scale=rate_scale_2)
+    rate_color_2 = alt.Color(field=field_2, type='quantitative', scale=rate_scale_2, legend=alt.Legend(title="Deaths"))
     # Redraw second map with the selected color scheme
     chart_2 = chart_base.mark_geoshape().encode(
     color=rate_color_2,
@@ -330,15 +295,13 @@ if selected_countries == 'All Countries':
 else:
     merged_df_selected = merged_df[merged_df['Country'].isin(selected_countries)][['Country', 'Year', 'country-code', field_1, field_2]]
 
-st.write(merged_df_selected)
-
 # Line plot for temporal data (deaths over years for selected countries)
 line_chart = alt.Chart(merged_df_selected).mark_line().encode(
     x=alt.X('Year:O', title='Year'),
     y=alt.Y(f'{field_1}:Q', title=f'{field_1} Deaths'),
     color='Country:N',
     tooltip=['Country:N', 'Year:O', f'{field_1}:Q']
-).properties(title=f'{field_1} Deaths Over Time', width=600, height=200)
+).properties(title=f'{field_1} Deaths Over Time', width=600, height=500)
 
 st.altair_chart(line_chart, use_container_width=True)
 
@@ -349,4 +312,4 @@ st.altair_chart(line_chart, use_container_width=True)
 # top_causes = country_data.sum().sort_values(ascending=False).head(5).reset_index()
 # top_causes.columns = ['Cause', 'Deaths']
 # donut_chart = alt.Chart(top_causes).mark_arc(innerRadius=50, outerRadius=100).encode(theta=alt.Theta(field='Deaths', type='quantitative'),
-#   color=alt.Color(field='Cause', type='nominal'), tooltip=['Cause:N', 'Deaths:Q']).properties(title=f'Top Causes of Death in {selected_country}')
+# color=alt.Color(field='Cause', type='nominal'), tooltip=['Cause:N', 'Deaths:Q']).properties(title=f'Top Causes of Death in {selected_country}')
