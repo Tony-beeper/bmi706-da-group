@@ -336,17 +336,35 @@ if selected_countries == 'All Countries':
     merged_df_selected = merged_df[['Country Name', 'year', 'Country Code', field_1, field_2]]
 else:
     merged_df_selected = merged_df[merged_df['Country Name'].isin(selected_countries)][['Country Name', 'year', 'Country Code', field_1, field_2]]
+    
+merged_df_selected['data_type'] = merged_df_selected['year'].apply(lambda x: 'Current Data' if x <= 2019 else 'Prediction')
 
-# Line plot for temporal data (deaths over years for selected countries)
-line_chart = alt.Chart(merged_df_selected).mark_line().encode(
+# Base chart for common encoding
+base = alt.Chart(merged_df_selected).encode(
     x=alt.X('year:O', title='Year'),
     y=alt.Y(f'{field_1}:Q', title=f'{field_1} Deaths'),
     color='Country Name:N',
     tooltip=['Country Name:N', 'year:O', f'{field_1}:Q']
-).properties(title=f'{field_1} Deaths Over Time', width=600, height=500)
+)
 
+# Solid line for current data
+current_data = base.transform_filter(
+    alt.datum.data_type == 'Current Data'
+).mark_line(strokeDash=[0])
 
+# Dashed line for prediction data
+prediction_data = base.transform_filter(
+    alt.datum.data_type == 'Prediction'
+).mark_line(strokeDash=[5, 5])
 
+# Combine both layers
+line_chart = alt.layer(current_data, prediction_data).properties(
+    title=f'{field_1} Deaths Over Time ( ─── : Current Data, ----: Prediction)',
+    width=600,
+    height=500
+)
+
+# Display the chart
 with colc:
     st.altair_chart(line_chart, use_container_width=True)
 
