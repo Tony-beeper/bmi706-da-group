@@ -82,8 +82,8 @@ causes = ['Meningitis', 'Alzheimers_Disease_and_Other_Dementias',
 source = alt.topo_feature(data.world_110m.url, 'countries')
 
 # Defining basic parameters
-width = 1000
-height  = 500
+width = 10000
+height  = 650
 project = 'equirectangular'
 
 st.markdown(
