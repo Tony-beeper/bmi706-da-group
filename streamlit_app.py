@@ -328,7 +328,7 @@ with colb:
 
 
 ############################# Line Chart & Donut Chart ##################################################
-colc, cold = st.columns(2)
+colc, cold = st.columns([20, 10])
 
 #merged_df = merged_df.rename(columns=lambda x: clean_column_name(x))
 
@@ -337,6 +337,9 @@ if selected_countries == 'All Countries':
 else:
     merged_df_selected = merged_df[merged_df['Country Name'].isin(selected_countries)][['Country Name', 'year', 'Country Code', field_1, field_2]]
     
+
+
+# Sample data and data type assignment (Current Data or Prediction)
 merged_df_selected['data_type'] = merged_df_selected['year'].apply(lambda x: 'Current Data' if x <= 2019 else 'Prediction')
 
 # Base chart for common encoding
@@ -359,14 +362,41 @@ prediction_data = base.transform_filter(
 
 # Combine both layers
 line_chart = alt.layer(current_data, prediction_data).properties(
-    title=f'{field_1} Deaths Over Time ( ─── : Current Data, ----: Prediction)',
+    title=f'{field_1} Deaths Over Time',
     width=600,
     height=500
 )
 
-# Display the chart
+# Creating the legend for line styles (Current Data and Prediction)
+legend_data = pd.DataFrame({
+    'label': ['', ''],
+    'Line Representation': ['Collected data', 'Our Prediction'],
+    'y': [1, 2]  # Dummy y-values for positioning
+})
+
+legend_chart = alt.Chart(legend_data).mark_line().encode(
+    y=alt.Y('y:O', axis=None),  # Hides the axis
+    x=alt.value(0),  # Position the legend lines horizontally
+    strokeDash='Line Representation:N',
+    color=alt.value('red'),
+    size=alt.value(2)
+).properties(
+    width=100,
+    height=50
+).encode(
+    alt.Tooltip('label:N')
+)
+
+
+# Combine line_chart and legend
+final_chart = alt.vconcat(
+    legend_chart,
+    line_chart   
+)
+
+# Display the final chart
 with colc:
-    st.altair_chart(line_chart, use_container_width=True)
+    st.altair_chart(final_chart, use_container_width=True)
 
 # Donut Chart
 # Filter data for the selected countries
