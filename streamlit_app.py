@@ -370,7 +370,7 @@ line_chart = alt.layer(current_data, prediction_data).properties(
 # Creating the legend for line styles (Current Data and Prediction)
 legend_data = pd.DataFrame({
     'label': ['', ''],
-    'Line Representation': ['Collected data', 'Our Prediction'],
+    'Line Representation': ['Collected Data', 'Arima Model Prediction'],
     'y': [1, 2]  # Dummy y-values for positioning
 })
 
