@@ -9,7 +9,7 @@ body, html, body, div, span, h1, h2, h3, h4, h5, h6, li, a, input, label, [class
     font-family: 'Montserrat', sans-serif !important;
     /* font-family: "Lucida Console", "Courier New", monospace !important; */
 
-    /* font-size: 10px; */
+    /* font-size: 8px; */
 }
 
 p{
@@ -54,11 +54,4 @@ footer {
 
 footer {
     visibility: hidden;
-}
-
-.st-emotion-cache-1y4p8pa {
-    width: 100%;
-    padding: 1rem 1rem 1rem;
-    max-width: 1000rem;
-    margin-top: 5000px;
 }

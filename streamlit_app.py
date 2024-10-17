@@ -215,9 +215,9 @@ with cola:
             ]
         ).properties( title=alt.TitleParams(
         text=title_1,
-        fontSize=18,
+        fontSize=19,
+        font='Montserrat',  # Optionally set a custom font
         anchor='start',  # Align title to the left
-        offset=0  # Reduce space between title and map
     ),)
     with col1:
         st.altair_chart(background + chart_1, use_container_width=True)
@@ -238,8 +238,16 @@ with colb:
             tooltip=[
                 alt.Tooltip(f'{field_2}:Q', title=tooltip_title),
                 alt.Tooltip('Country Name:N', title='Country')
-            ]       
-        ).properties(title={'text': title_2})
+            ]
+        ).properties(
+            title=alt.TitleParams(
+                text=title_2,   # Set the title text here
+                fontSize=19,    # Adjust the font size
+                font='Montserrat',  # Optionally set a custom font
+                anchor='start',  # Control the alignment ('start', 'middle', 'end')
+                # color='black'    # Set the color of the title (optional)
+            )
+        )
 
     with col3:
         st.altair_chart(background + chart_2, use_container_width=True)
@@ -279,10 +287,16 @@ prediction_data = base.transform_filter(alt.datum.data_type == 'Prediction').mar
 
 # Combine both layers
 line_chart = alt.layer(current_data, prediction_data).properties(
-    title=f'{field_1} Deaths per 100,000 Over Time ',
+    title=alt.TitleParams(
+        text=f'{field_1} Deaths per 100,000 Over Time',
+        fontSize=19,  # Set the desired font size here
+        font='Montserrat',  # Optionally, set the font family if needed
+        anchor='start'  # You can control the alignment of the title
+    ),
     width=500,
     height=300
 )
+
 
 # Creating the legend for line styles (Current Data and Prediction)
 legend_data = pd.DataFrame({
@@ -325,13 +339,59 @@ numeric_data = numeric_data[categories]*100000/numeric_data['Total_Population']
 top_causes = numeric_data.sort_values(ascending=False).head(7).reset_index()
 top_causes.columns = ['Cause', 'Deaths']
 
+
 # Create the donut chart
-donut_chart = alt.Chart(top_causes).mark_arc(innerRadius=50, outerRadius=100).encode(
+donut_chart = alt.Chart(top_causes).mark_arc(innerRadius=50, outerRadius=110).encode(
     theta=alt.Theta(field='Deaths', type='quantitative'),
-    color=alt.Color(field='Cause', type='nominal', title = 'Category'),
-    tooltip=[alt.Tooltip('Cause:N', title = 'Category'), alt.Tooltip('Deaths:Q', title='Deaths per 100,000')]
-).properties(title=f'Category-wise distribution of deaths per 100,000 for selected countries in ' + str(year))
+    color=alt.Color(field='Cause', type='nominal', title='Category'),
+    tooltip=[alt.Tooltip('Cause:N', title='Category'), alt.Tooltip('Deaths:Q', title='Deaths per 100,000')]
+).properties(
+    title={
+        'text': [
+            f'Category-wise distribution of deaths per 100,000',
+            f'for selected countries in {year}'
+
+        ],
+        'fontSize': 19,  # Set the title font size to 19
+        'font': 'Montserrat',  # Set the custom font to Montserrat
+        'anchor': 'start'      # Align the title to the left
+    }
+
+    # title=alt.TitleParams(
+    #     text=f'Category-wise distribution of deaths per 100,000 for selected countries in {year}',  # Setting the title text
+    #     fontSize=19,
+    #     font='Montserrat',  # Optionally set a custom font
+    #     anchor='start',  # Align title to the left
+    # )
+)
+
+
 
 with cold:
-    # Display the chart
+    # # Display the title separately
+    # # Add the div with a specific ID to apply custom styles
+    # st.markdown(f"""
+    #     <div id='custom-title'>
+    #         <p style='font-size:19px; margin-top: 0px;'>Category-wise distribution of deaths per 100,000 for selected countries in {year}</p>
+    #     </div>
+    #     """, unsafe_allow_html=True)
+
+    # # Apply custom CSS specifically for the custom-title
+    # st.markdown(
+    #     """
+    #     <style>
+    #     #custom-title p {
+    #         font-size: 19px !important; 
+    #         margin-top: 0px !important; 
+    #     }
+    #     </style>
+    #     """, 
+    #     unsafe_allow_html=True
+    # )
+        
+    # # Add some empty space between the title and the chart
+    # st.write("")  # Add as many st.write("") as needed for spacing
+    # st.write("")  # Add as many st.write("") as needed for spacing
+    # st.write("")  # Add as many st.write("") as needed for spacing
+    # Display the chart below the title
     st.altair_chart(donut_chart, use_container_width=True)
