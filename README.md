@@ -20,5 +20,5 @@ replace [req] with requirements
     streamlit run streamlit_app.py
     ```
 
-## Online version(might be gone) ##
+## Deployed version(might be gone) ##
 **App Link:** [https://bmi706-da-group-fekns2hbbnaz7sndcsue96.streamlit.app/](https://bmi706-da-group-fekns2hbbnaz7sndcsue96.streamlit.app/)
