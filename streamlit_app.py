@@ -7,11 +7,8 @@ st.set_page_config(layout="wide")
 with open( "./style.css" ) as css:
     st.markdown( f'<style>{css.read()}</style>' , unsafe_allow_html= True)
 
-#pd.options.display.float_format = '{:.2f}'.format
 merged_df = pd.read_csv('./data/final_data.csv', index_col=False)
 merged_df = merged_df.round(3)
-#country_df = pd.read_csv('https://raw.githubusercontent.com/hms-dbmi/bmi706-2022/main/cancer_data/country_codes.csv', dtype = {'country-code': int})
-#country_df = country_df[['Country', 'country-code']]
 categories = ['External_Causes', 'Infectious_Diseases',
        'Maternal_and_Neonatal_Health', 'Non_Communicable_Diseases',
        'Nutritional_and_Metabolic_Disorders', 'Substance_Use_Disorders',
@@ -43,15 +40,23 @@ continent_mapping = {'Albania': 'Europe','Andorra': 'Europe','Austria': 'Europe'
  'Afghanistan': 'Asia','Armenia': 'Asia','Azerbaijan': 'Asia','Bahrain': 'Asia','Bangladesh': 'Asia','Bhutan': 'Asia','Brunei Darussalam': 'Asia','Cambodia': 'Asia',
  'China': 'Asia','Georgia': 'Asia','India': 'Asia','Indonesia': 'Asia','Iran (Islamic Republic of)': 'Asia','Iraq': 'Asia','Israel': 'Asia','Japan': 'Asia',
  'Jordan': 'Asia','Kazakhstan': 'Asia','Kuwait': 'Asia','Kyrgyzstan': 'Asia',"Lao People's Democratic Republic": 'Asia','Lebanon': 'Asia','Malaysia': 'Asia',
- 'Maldives': 'Asia','Mongolia': 'Asia','Myanmar': 'Asia','Nepal': 'Asia','Oman': 'Asia','Pakistan': 'Asia','Philippines': 'Asia','Qatar': 'Asia','Saudi Arabia': 'Asia','Singapore': 'Asia','Sri Lanka': 'Asia','Syrian Arab Republic': 'Asia','Tajikistan': 'Asia','Thailand': 'Asia','Timor-Leste': 'Asia','Turkey': 'Asia','Turkmenistan': 'Asia','United Arab Emirates': 'Asia','Uzbekistan': 'Asia','Viet Nam': 'Asia','Yemen': 'Asia','Algeria': 'Africa','Angola': 'Africa','Benin': 'Africa','Botswana': 'Africa','Burkina Faso': 'Africa','Burundi': 'Africa','Cabo Verde': 'Africa','Cameroon': 'Africa','Central African Republic': 'Africa','Chad': 'Africa','Comoros': 'Africa','Congo': 'Africa','Congo, Democratic Republic of the': 'Africa',"Côte d'Ivoire": 'Africa','Djibouti': 'Africa','Egypt': 'Africa','Equatorial Guinea': 'Africa','Eritrea': 'Africa','Eswatini': 'Africa','Ethiopia': 'Africa','Gabon': 'Africa','Gambia': 'Africa','Ghana': 'Africa','Guinea': 'Africa','Guinea-Bissau': 'Africa','Kenya': 'Africa','Lesotho': 'Africa','Liberia': 'Africa','Libya': 'Africa','Madagascar': 'Africa','Malawi': 'Africa','Mali': 'Africa','Mauritania': 'Africa','Mauritius': 'Africa','Morocco': 'Africa','Mozambique': 'Africa','Namibia': 'Africa','Niger': 'Africa','Nigeria': 'Africa','Rwanda': 'Africa','Sao Tome and Principe': 'Africa','Senegal': 'Africa','Seychelles': 'Africa','Sierra Leone': 'Africa','Somalia': 'Africa','South Africa': 'Africa','South Sudan': 'Africa','Sudan': 'Africa',
- 'Tanzania, United Republic of': 'Africa','Togo': 'Africa','Tunisia': 'Africa','Uganda': 'Africa',
- 'Zambia': 'Africa','Zimbabwe': 'Africa',
- 'Antigua and Barbuda': 'North America','Bahamas': 'North America','Barbados': 'North America','Belize': 'North America','Bermuda': 'North America','Canada': 'North America',
- 'Costa Rica': 'North America','Cuba': 'North America','Dominica': 'North America','Dominican Republic': 'North America','El Salvador': 'North America','Grenada': 'North America','Guatemala': 'North America',
- 'Haiti': 'North America','Honduras': 'North America','Jamaica': 'North America','Mexico': 'North America','Nicaragua': 'North America','Panama': 'North America','Puerto Rico': 'North America','Saint Kitts and Nevis': 'North America','Saint Lucia': 'North America','Saint Vincent and the Grenadines': 'North America',
- 'Trinidad and Tobago': 'North America','United States of America': 'North America',
- 'Virgin Islands (U.S.)': 'North America','Argentina': 'South America','Bolivia (Plurinational State of)': 'South America','Brazil': 'South America','Chile': 'South America','Colombia': 'South America','Ecuador': 'South America','Guyana': 'South America','Paraguay': 'South America','Peru': 'South America','Suriname': 'South America','Uruguay': 'South America',
- 'Venezuela': 'South America','Australia': 'Australia','Fiji': 'Australia','Kiribati': 'Australia','Marshall Islands': 'Australia','Micronesia (Federated States of)': 'Australia','Nauru': 'Australia','New Zealand': 'Australia','Palau': 'Australia','Papua New Guinea': 'Australia','Samoa': 'Australia','Solomon Islands': 'Australia','Tonga': 'Australia','Tuvalu': 'Australia','Vanuatu': 'Australia'}
+ 'Maldives': 'Asia','Mongolia': 'Asia','Myanmar': 'Asia','Nepal': 'Asia','Oman': 'Asia','Pakistan': 'Asia','Philippines': 'Asia','Qatar': 'Asia','Saudi Arabia': 'Asia','Singapore': 'Asia',
+ 'Sri Lanka': 'Asia','Syrian Arab Republic': 'Asia','Tajikistan': 'Asia','Thailand': 'Asia','Timor-Leste': 'Asia','Turkey': 'Asia','Turkmenistan': 'Asia','United Arab Emirates': 'Asia',
+ 'Uzbekistan': 'Asia','Viet Nam': 'Asia','Yemen': 'Asia','Algeria': 'Africa','Angola': 'Africa','Benin': 'Africa','Botswana': 'Africa','Burkina Faso': 'Africa','Burundi': 'Africa',
+ 'Cabo Verde': 'Africa','Cameroon': 'Africa','Central African Republic': 'Africa','Chad': 'Africa','Comoros': 'Africa','Congo': 'Africa','Congo, Democratic Republic of the': 'Africa',
+ "Côte d'Ivoire": 'Africa','Djibouti': 'Africa','Egypt': 'Africa','Equatorial Guinea': 'Africa','Eritrea': 'Africa','Eswatini': 'Africa','Ethiopia': 'Africa','Gabon': 'Africa','Gambia': 'Africa',
+ 'Ghana': 'Africa','Guinea': 'Africa','Guinea-Bissau': 'Africa','Kenya': 'Africa','Lesotho': 'Africa','Liberia': 'Africa','Libya': 'Africa','Madagascar': 'Africa','Malawi': 'Africa',
+ 'Mali': 'Africa','Mauritania': 'Africa','Mauritius': 'Africa','Morocco': 'Africa','Mozambique': 'Africa','Namibia': 'Africa','Niger': 'Africa','Nigeria': 'Africa','Rwanda': 'Africa',
+ 'Sao Tome and Principe': 'Africa','Senegal': 'Africa','Seychelles': 'Africa','Sierra Leone': 'Africa','Somalia': 'Africa','South Africa': 'Africa','South Sudan': 'Africa','Sudan': 'Africa',
+ 'Tanzania, United Republic of': 'Africa','Togo': 'Africa','Tunisia': 'Africa','Uganda': 'Africa', 'Zambia': 'Africa','Zimbabwe': 'Africa', 'Antigua and Barbuda': 'North America',
+ 'Bahamas': 'North America','Barbados': 'North America','Belize': 'North America','Bermuda': 'North America','Canada': 'North America', 'Costa Rica': 'North America',
+ 'Cuba': 'North America','Dominica': 'North America','Dominican Republic': 'North America','El Salvador': 'North America','Grenada': 'North America','Guatemala': 'North America',
+ 'Haiti': 'North America','Honduras': 'North America','Jamaica': 'North America','Mexico': 'North America','Nicaragua': 'North America','Panama': 'North America','Puerto Rico': 'North America',
+ 'Saint Kitts and Nevis': 'North America','Saint Lucia': 'North America','Saint Vincent and the Grenadines': 'North America', 'Trinidad and Tobago': 'North America',
+ 'United States of America': 'North America', 'Virgin Islands (U.S.)': 'North America','Argentina': 'South America','Bolivia (Plurinational State of)': 'South America','Brazil': 'South America',
+ 'Chile': 'South America','Colombia': 'South America','Ecuador': 'South America','Guyana': 'South America','Paraguay': 'South America','Peru': 'South America','Suriname': 'South America','Uruguay': 'South America',
+ 'Venezuela': 'South America','Australia': 'Australia','Fiji': 'Australia','Kiribati': 'Australia','Marshall Islands': 'Australia','Micronesia (Federated States of)': 'Australia','Nauru': 'Australia',
+ 'New Zealand': 'Australia','Palau': 'Australia','Papua New Guinea': 'Australia','Samoa': 'Australia','Solomon Islands': 'Australia','Tonga': 'Australia','Tuvalu': 'Australia','Vanuatu': 'Australia'}
 
 # Initial map
 source = alt.topo_feature(data.world_110m.url, 'countries')
@@ -60,7 +65,6 @@ source = alt.topo_feature(data.world_110m.url, 'countries')
 width = 1000
 height  = 500
 project = 'equirectangular'
-
 
 # Mapping regoins
 regions = {
@@ -72,7 +76,7 @@ regions = {
     'South America': {'center': [-60, -30], 'scale': 300},
     'Australia': {'center': [140, -40], 'scale': 450}
 }
-####################################################### Sidebar #######################################################
+####################################################### Sidebar and Widgets #######################################################
 
 # Select year, slider for maps
 year = st.slider('Year:', min_value=int(merged_df['year'].min()), max_value=int(merged_df['year'].max()), value=2014)
@@ -81,8 +85,6 @@ with st.sidebar:
     # Select region
     selected_region = 'World' # Default
     st.write('Click on region of interest')
-
-    # Display buttons
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button('World'):
@@ -101,11 +103,9 @@ with st.sidebar:
             selected_region = 'North America'
         if st.button('South America'):
             selected_region = 'South America'
-
-    # Show the selected region
     st.write(f'You selected: {selected_region}')
 
-    # Select specific country, can also be done by clicking on it
+    # Select country
     country_options = ['All Countries'] + list(merged_df['Country Name'].unique())  
     selected_countries = st.multiselect('Countries for cause of death trend(line chart)', country_options, default='All Countries', max_selections=10)
     if selected_countries == ['All Countries']:
@@ -113,25 +113,25 @@ with st.sidebar:
     else:
         selected_countries = list(selected_countries)
 
-    # Choosing color schema
-    color_schemes = ['oranges', 'blues', 'greens', 'reds', 'purples', 'viridis', 'plasma', 'inferno']
+    # Select color schema
+    color_schemes = ['viridis', 'plasma', 'inferno', 'oranges', 'blues', 'greens', 'reds', 'purples']
 
-    # First map
-    st.sidebar.write("Map 1 selection:")
+    # Select options for the first map
+    st.sidebar.write('Map 1 selection:')
     map1_selection = st.sidebar.selectbox('Select cause of death or category for Map 1', categories + causes, index=0)
     st.write(f'You chose to compare for Map 1: {map1_selection}')
+    color_scheme_1 = st.selectbox('Color Scheme for Map 1', color_schemes, index=0)
 
-    # Second map
-    st.sidebar.write("Map 2 selection:")
-    second_map_radio = st.sidebar.radio("Choose what to compare for Map 2:", ['Individual cause of death or category', 'Socioeconomic factor'])
-
-    map2_selection = "Drowning"    
-    # Display dropdown based on the radio selection
+    # Select options for the second map
+    st.sidebar.write('Map 2 selection:')
+    second_map_radio = st.sidebar.radio('Choose what to compare for Map 2:', ['Individual cause of death or category', 'Socioeconomic factor'])
+    map2_selection = 'Drowning'   
     if second_map_radio == 'Individual cause of death or category':
         cat_and_causes = categories + causes
         map2_selection = st.sidebar.selectbox('Select cause of death or category for Map 2', [item for item in cat_and_causes if item != map1_selection], index=0)
     else:
         map2_selection = st.sidebar.selectbox('Select socioeconomic factor for Map 2', socioeconomic_factors)
+    color_scheme_2 = st.selectbox('Color Scheme for Map 2', color_schemes, index=1)
 
     field_1, field_2 = map1_selection, map2_selection
 
@@ -160,7 +160,7 @@ chart_base = alt.Chart(source).properties(width=width, height=height).project(
     lookup='id',
     from_=alt.LookupData(merged_df_selected, 'Country Code', ['Country Name', 'year', field_1, field_2]))
 
-############################# Actual Maps and Chart functions ######################################
+######################################################## Maps ###############################################################
 title_1 = f"Number of deaths caused by {map1_selection} in {year}"
 if second_map_radio == 'Individual cause of death or category':
     title_2 = f"Number of deaths caused by {map2_selection} in {year}"
@@ -170,7 +170,7 @@ else:
     tooltip_title = f"{map2_selection}"
 
 # First map
-rate_scale_1 = alt.Scale(domain=[merged_df_selected[field_1].min(), merged_df_selected[field_1].max()], scheme='oranges')
+rate_scale_1 = alt.Scale(domain=[merged_df_selected[field_1].min(), merged_df_selected[field_1].max()], scheme=color_schemes[0])
 rate_color_1 = alt.Color(field=field_1, type='quantitative', scale=rate_scale_1)
 
 chart_1 = chart_base.mark_geoshape().encode(
@@ -183,7 +183,7 @@ chart_1 = chart_base.mark_geoshape().encode(
 ).properties(title={'text': title_1})
 
 # Second map
-rate_scale_2 = alt.Scale(domain=[merged_df_selected[field_2].min(), merged_df_selected[field_2].max()], scheme='blues')
+rate_scale_2 = alt.Scale(domain=[merged_df_selected[field_2].min(), merged_df_selected[field_2].max()], scheme=color_schemes[1])
 rate_color_2 = alt.Color(field=field_2, type='quantitative', scale=rate_scale_2)
 
 chart_2 = chart_base.mark_geoshape().encode(
@@ -199,15 +199,13 @@ cola, colb = st.columns(2)
 with cola:
     col1, spacer1, col2 = st.columns([24, 0.1, 1])
     with col2:
-        with st.sidebar:
-            color_scheme_1 = st.selectbox("Color Scheme for Map 1", color_schemes, index=0)
         # Update color scheme
         rate_scale_1 = alt.Scale(domain=[merged_df[field_1].min(), merged_df[field_1].max()], scheme=color_scheme_1)
         rate_color_1 = alt.Color(field=field_1, type='quantitative', scale=rate_scale_1, legend=alt.Legend(title="Rate",titleFontSize=10,         # Smaller title font
             labelFontSize=8,          # Smaller label font
             gradientLength=150,       # Shorter gradient bar
             gradientThickness=8,      # Thinner gradient bar
-            orient='bottom-right' ))
+            orient='right' ))
         # Redraw first map with the selected color scheme
         chart_1 = chart_base.mark_geoshape().encode(
             color=rate_color_1,
@@ -227,15 +225,13 @@ with cola:
 with colb:
     col3, spacer2, col4 = st.columns([24, 0.5, 1])
     with col4:
-        with st.sidebar:
-            color_scheme_2 = st.selectbox("Color Scheme for Map 2", color_schemes, index=1)
         # Update color scheme
         rate_scale_2 = alt.Scale(domain=[merged_df[field_2].min(), merged_df[field_2].max()], scheme=color_scheme_2)
         rate_color_2 = alt.Color(field=field_2, type='quantitative', scale=rate_scale_2, legend=alt.Legend(title="Rate",titleFontSize=10,         # Smaller title font
             labelFontSize=8,          # Smaller label font
             gradientLength=150,       # Shorter gradient bar
             gradientThickness=8,      # Thinner gradient bar
-            orient='bottom-right' ))
+            orient='right' ))
         # Redraw second map with the selected color scheme
         chart_2 = chart_base.mark_geoshape().encode(
             color=rate_color_2,
@@ -250,7 +246,6 @@ with colb:
 
 ############################# Line Chart & Donut Chart ##################################################
 colc, cold = st.columns([20, 10])
-#merged_df = merged_df.rename(columns=lambda x: clean_column_name(x))
 
 if selected_countries == list(merged_df['Country Name'].unique()):
     merged_df_selected = merged_df[['Country Name', 'year', 'Country Code', 'Total_Population', field_1, field_2]]
@@ -265,7 +260,6 @@ if selected_countries == list(merged_df['Country Name'].unique()):
 else:
     merged_df_selected = merged_df[merged_df['Country Name'].isin(selected_countries)][['Country Name', 'year', 'Country Code', field_1, field_2]]
 
-
 # Sample data and data type assignment (Current Data or Prediction)
 merged_df_selected['data_type'] = merged_df_selected['year'].apply(lambda x: 'Current Data' if x <= 2019 else 'Prediction')
 
@@ -278,26 +272,22 @@ base = alt.Chart(merged_df_selected).encode(
 )
 
 # Solid line for current data
-current_data = base.transform_filter(
-    alt.datum.data_type == 'Current Data'
-).mark_line(strokeDash=[0])
+current_data = base.transform_filter(alt.datum.data_type == 'Current Data').mark_line(strokeDash=[0])
 
 # Dashed line for prediction data
-prediction_data = base.transform_filter(
-    alt.datum.data_type == 'Prediction'
-).mark_line(strokeDash=[5, 5])
+prediction_data = base.transform_filter(alt.datum.data_type == 'Prediction').mark_line(strokeDash=[5, 5])
 
 # Combine both layers
 line_chart = alt.layer(current_data, prediction_data).properties(
     title=f'{field_1} Deaths per 100,000 Over Time ',
-    width=600,
-    height=500
+    width=500,
+    height=300
 )
 
 # Creating the legend for line styles (Current Data and Prediction)
 legend_data = pd.DataFrame({
     'label': ['', ''],
-    'Representation': ['Collected data','Model(ARIMA) Prediction'],
+    'Representation': ['Collected data','Model Prediction'],
     'y': [1, 2]  # Dummy y-values for positioning
 })
 
@@ -308,18 +298,14 @@ legend_chart = alt.Chart(legend_data).mark_line().encode(
     color=alt.value('red'),
     size=alt.value(2)
 ).properties(
-    width=100,
+    width=20,
     height=50
 ).encode(
     alt.Tooltip('label:N')
 )
 
-
 # Combine line_chart and legend
-final_chart = alt.vconcat(
-    legend_chart,
-    line_chart   
-)
+final_chart = alt.hconcat(legend_chart,line_chart)
 
 # Display the final chart
 with colc:
