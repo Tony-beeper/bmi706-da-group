@@ -12,7 +12,7 @@ Tanush Kumar, Jurijs Alehins, Anthony Tan
     ```bash
     pip install -r req
     ```
-[replace req with requirements]
+replace [req] with requirements
 
 2. Then, run the app using:
 
