@@ -172,26 +172,11 @@ else:
 rate_scale_1 = alt.Scale(domain=[merged_df_selected[field_1].min(), merged_df_selected[field_1].max()], scheme=color_scheme_1)
 rate_color_1 = alt.Color(field=field_1, type='quantitative', scale=rate_scale_1)
 
-chart_1 = chart_base.mark_geoshape().encode(
-    color=rate_color_1,
-    tooltip=[
-        alt.Tooltip(f'{field_1}:Q', title=f'{field_1} Deaths per 100,000'),
-        alt.Tooltip('Country Name:N', title='Country')
-
-    ]
-).properties(title={'text': title_1})
 
 # Second map
 rate_scale_2 = alt.Scale(domain=[merged_df_selected[field_2].min(), merged_df_selected[field_2].max()], scheme=color_scheme_2)
 rate_color_2 = alt.Color(field=field_2, type='quantitative', scale=rate_scale_2)
 
-chart_2 = chart_base.mark_geoshape().encode(
-    color=rate_color_2,
-    tooltip=[
-        alt.Tooltip(f'{field_2}:Q', title=tooltip_title),
-        alt.Tooltip('Country Name:N', title='Country')
-    ]
-).properties(title={'text': title_2})
 
 cola, colb = st.columns(2)
 
@@ -206,7 +191,7 @@ with cola:
             gradientThickness=8,      # Thinner gradient bar
             orient='right' ))
         # Redraw first map with the selected color scheme
-        chart_1 = chart_base.mark_geoshape().encode(
+        chart_1 = chart_base.mark_geoshape(stroke='white', strokeWidth=0.2).encode(
             color=rate_color_1,
             tooltip=[
                 alt.Tooltip(f'{field_1}:Q', title=f'{field_1} Deaths per 100,000'),
@@ -232,7 +217,7 @@ with colb:
             gradientThickness=8,      # Thinner gradient bar
             orient='right' ))
         # Redraw second map with the selected color scheme
-        chart_2 = chart_base.mark_geoshape().encode(
+        chart_2 = chart_base.mark_geoshape(stroke='white', strokeWidth=0.2).encode(
             color=rate_color_2,
             tooltip=[
                 alt.Tooltip(f'{field_2}:Q', title=tooltip_title),
@@ -300,7 +285,7 @@ line_chart = alt.layer(current_data, prediction_data).properties(
 # Creating the legend for line styles (Current Data and Prediction)
 legend_data = pd.DataFrame({
     'label': ['', ''],
-    'Representation': ['Collected data','Model Prediction'],
+    'Representation': ['Collected data','ML Prediction'],
     'y': [1, 2]  # Dummy y-values for positioning
 })
 
