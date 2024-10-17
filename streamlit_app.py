@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 from vega_datasets import data
 import streamlit as st
 st.set_page_config(layout="wide")
+with open( "./style.css" ) as css:
+    st.markdown( f'<style>{css.read()}</style>' , unsafe_allow_html= True)
+
 #pd.options.display.float_format = '{:.2f}'.format
 merged_df = pd.read_csv('./data/final_data.csv', index_col=False)
 merged_df = merged_df.round(3)
@@ -100,27 +103,9 @@ continent_mapping = {'Albania': 'Europe','Andorra': 'Europe','Austria': 'Europe'
 source = alt.topo_feature(data.world_110m.url, 'countries')
 
 # Defining basic parameters
-width = 10000
+width = 100000
 height  = 800
 project = 'equirectangular'
-
-st.markdown(
-    """
-    <style>
-
-            .uploadedFile {{display: none}}
-            footer {{visibility: hidden;}}
-            .st-emotion-cache-1y4p8pa {
-                width: 100%;
-                padding: 1rem 1rem 1rem;
-                max-width: 1000rem;
-                margin-top: 50px
-
-            }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
 
 
 # Mapping regoins
@@ -390,7 +375,7 @@ prediction_data = base.transform_filter(
 
 # Combine both layers
 line_chart = alt.layer(current_data, prediction_data).properties(
-    title=f'{field_1} Deaths per 100,000Over Time ',
+    title=f'{field_1} Deaths per 100,000 Over Time ',
     width=600,
     height=500
 )
@@ -398,14 +383,14 @@ line_chart = alt.layer(current_data, prediction_data).properties(
 # Creating the legend for line styles (Current Data and Prediction)
 legend_data = pd.DataFrame({
     'label': ['', ''],
-    'Key': ['Arima Model Prediction','Collected Data'],
+    'Representation': ['Collected data','Model(ARIMA) Prediction'],
     'y': [1, 2]  # Dummy y-values for positioning
 })
 
 legend_chart = alt.Chart(legend_data).mark_line().encode(
     y=alt.Y('y:O', axis=None),  # Hides the axis
     x=alt.value(0),  # Position the legend lines horizontally
-    strokeDash='Key:N',
+    strokeDash='Representation:N',
     color=alt.value('red'),
     size=alt.value(2)
 ).properties(

@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap'); 
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap');
+* {
+    font-family: 'Source Sans Pro', sans-serif !important;
+}
+body, html, body, div, span, h1, h2, h3, h4, h5, h6, li, a, input, label, [class="css"] {
+    font-family: 'Montserrat', sans-serif !important;
+    /* font-family: "Lucida Console", "Courier New", monospace !important; */
+
+    /* font-size: 10px; */
+}
+
+p{
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 13px !important;
+}
+
+/* html, body, [class*="css"] {
+    font-family: 'Roboto', sans-serif; 
+    font-size: 18px;
+    font-weight: 500;
+    color: #091747;
+} */
+
+.uploadedFile {
+    display: none;
+}
+
+footer {
+    visibility: hidden;
+}
+
+.st-emotion-cache-1y4p8pa {
+    width: 100%;
+    padding: 1rem 1rem 1rem;
+    max-width: 1000rem;
+    margin-top: 50px;
+}
+
+
+
+
+/* Apply the font to the main elements and ensure it's enforced */
+
+
+.st-emotion-cache-1rliupu {
+    font-size: 200px;  /* You can modify the font size */
+    background-color: #f9f9f9;  /* Change background color */
+    padding: 20px;  /* Add some padding */
+    border: 1px solid #ccc;  /* Add a border */
+}
+
+footer {
+    visibility: hidden;
+}
+
+.st-emotion-cache-1y4p8pa {
+    width: 100%;
+    padding: 1rem 1rem 1rem;
+    max-width: 1000rem;
+    margin-top: 5000px;
+}
