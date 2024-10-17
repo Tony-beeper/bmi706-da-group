@@ -1,7 +1,7 @@
 # BMI 706 Data Visualization App
 
 **Contributors:**  
-Tanush Kumar, Jurijs Alehins, Anthony Tan
+Tanush Kumar, Jurijs Alehins, Youxin Tan
 
 
 
