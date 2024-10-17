@@ -52,59 +52,13 @@ continent_mapping = {'Albania': 'Europe','Andorra': 'Europe','Austria': 'Europe'
  'Trinidad and Tobago': 'North America','United States of America': 'North America',
  'Virgin Islands (U.S.)': 'North America','Argentina': 'South America','Bolivia (Plurinational State of)': 'South America','Brazil': 'South America','Chile': 'South America','Colombia': 'South America','Ecuador': 'South America','Guyana': 'South America','Paraguay': 'South America','Peru': 'South America','Suriname': 'South America','Uruguay': 'South America',
  'Venezuela': 'South America','Australia': 'Australia','Fiji': 'Australia','Kiribati': 'Australia','Marshall Islands': 'Australia','Micronesia (Federated States of)': 'Australia','Nauru': 'Australia','New Zealand': 'Australia','Palau': 'Australia','Papua New Guinea': 'Australia','Samoa': 'Australia','Solomon Islands': 'Australia','Tonga': 'Australia','Tuvalu': 'Australia','Vanuatu': 'Australia'}
-# Mapping for countries with names abcent in the initial dataset
-# #name_mapping = {
-#     'Bolivia': 'Bolivia (Plurinational State of)',
-#     'Brunei': 'Brunei Darussalam',
-#     'Cape Verde': 'Cabo Verde',
-#     "Cote d'Ivoire": "Côte d'Ivoire",
-#     'Democratic Republic of Congo': 'Congo, Democratic Republic of the',
-#     'Iran': 'Iran (Islamic Republic of)',
-#     'Laos': "Lao People's Democratic Republic",
-#     'Micronesia': 'Micronesia (Federated States of)',
-#     'Moldova': 'Moldova, Republic of',
-#     'North Korea': "Korea (Democratic People's Republic of)",
-#     'Palestine': 'Palestine, State of',
-#     'Russia': 'Russian Federation',
-#     'South Korea': 'Korea, Republic of',
-#     'Syria': 'Syrian Arab Republic',
-#     'Taiwan': 'Taiwan, Province of China',
-#     'Tanzania': 'Tanzania, United Republic of',
-#     'Timor': 'Timor-Leste',
-#     'United Kingdom': 'United Kingdom of Great Britain and Northern Ireland',
-#     'United States': 'United States of America',
-#     'United States Virgin Islands': 'Virgin Islands (U.S.)',
-#     'Venezuela': 'Venezuela (Bolivarian Republic of)',
-#     'Vietnam': 'Viet Nam'
-# }
-
-# List of all socioeconomic factors
-# socioeconomic_factors = [
-#     "Age dependency ratio (% of working-age population)", "Birth rate, crude (per 1,000 people)", 
-#     "Fertility rate, total (births per woman)", "Life expectancy at birth, total (years)", 
-#     "Mortality rate, infant (per 1,000 live births)", 
-#     "Number of under-five deaths",  "Population ages 0-14 (% of total population)", 
-#     "Population ages 65 and above, total", "Population growth (annual %)", "Population, total", 
-#     "Rural population (% of total population)", "Urban population (% of total population)", 
-#     "Urban population growth (annual %)"
-# ]
-
-# List of all individual and categorized causes of deaths
-# causes_df = pd.read_csv('./data/causes_of_death_categories.csv')
-# cause_categories = dict(zip(causes_df['Cause of Death'], causes_df['Category']))
-# causes = list(cause_categories.keys())
-# categories = list(set(cause_categories.values()))
-
-# Merged dataframe
-# df['Country'] = df['Country'].replace(name_mapping)
-# merged_df = pd.merge(df, country_df, how='left', left_on='Country', right_on='Country')
 
 # Initial map
 source = alt.topo_feature(data.world_110m.url, 'countries')
 
 # Defining basic parameters
-width = 100000
-height  = 500
+width = 1000
+height  = 400
 project = 'equirectangular'
 
 
@@ -119,6 +73,9 @@ regions = {
     'Australia': {'center': [140, -40], 'scale': 450}
 }
 ####################################################### Sidebar #######################################################
+
+# Select year, slider for maps
+year = st.slider('Year:', min_value=int(merged_df['year'].min()), max_value=int(merged_df['year'].max()), value=2014)
 
 with st.sidebar:
     # Select region
@@ -148,9 +105,6 @@ with st.sidebar:
     # Show the selected region
     st.write(f'You selected: {selected_region}')
 
-    # Select year, slider for maps
-    year = st.slider('Year:', min_value=int(merged_df['year'].min()), max_value=int(merged_df['year'].max()), value=2014)
-
     # Select specific country, can also be done by clicking on it
     country_options = ['All Countries'] + list(merged_df['Country Name'].unique())  
     selected_countries = st.multiselect('Countries for cause of death trend(line chart)', country_options, default='All Countries', max_selections=10)
@@ -159,71 +113,29 @@ with st.sidebar:
     else:
         selected_countries = list(selected_countries)
 
-    # Select specific country, can also be done by clicking on it
-    # selected_countries_donut = st.multiselect('Countries for cummulative cause of death(Donut chart)', country_options, default='All Countries', max_selections=10)
-    # if selected_countries_donut == ['All Countries']:
-    #     selected_countries_donut = list(merged_df['Country Name'].unique())
-    # else:
-    #     selected_countries_donut = list(selected_countries_donut)
+    # Choosing color schema
+    color_schemes = ['oranges', 'blues', 'greens', 'reds', 'purples', 'viridis', 'plasma', 'inferno']
 
-    # Display dropdown menus based on selection
-    if 'initial_choice' not in st.session_state:
-        st.session_state.initial_choice = None
-    if 'reset' not in st.session_state:
-        st.session_state.reset = False
+    # First map
+    st.sidebar.write("Map 1 selection:")
+    map1_selection = st.sidebar.selectbox('Select cause of death or category for Map 1', categories + causes, index=0)
+    st.write(f'You chose to compare for Map 1: {map1_selection}')
 
-    # Initial choice: Type of comparison
-    initial_choice = st.sidebar.radio(
-    "Choose comparison type:",
-    [
-        'Causes of deaths comparison', 
-        'Categories of causes of deaths comparison', 
-        'Cause of deaths vs socioeconomic factor comparison', 
-        'Category of causes of deaths vs socioeconomic factor comparison'
-    ]
-    )
+    # Second map
+    st.sidebar.write("Map 2 selection:")
+    second_map_radio = st.sidebar.radio("Choose what to compare for Map 2:", ['Individual cause of death or category', 'Socioeconomic factor'])
 
-    # Display options based on the selected choice
-    if initial_choice == 'Causes of deaths comparison':
-        st.sidebar.write('Select causes of death to compare:')
-        cause_1 = st.sidebar.selectbox('Select first cause', causes, index=0)
-        cause_2 = st.sidebar.selectbox('Select second cause', causes, index=1)
-        st.write(f'You chose to compare: {cause_1} and {cause_2}')
-        title_1 = f"Number of deaths caused by {cause_1} in {year}"
-        title_2 = f"Number of deaths caused by {cause_2} in {year}"
-        field_1, field_2 = cause_1, cause_2
+    map2_selection = "Drowning"    
+    # Display dropdown based on the radio selection
+    if second_map_radio == 'Individual cause of death or category':
+        cat_and_causes = categories + causes
+        map2_selection = st.sidebar.selectbox('Select cause of death or category for Map 2', [item for item in cat_and_causes if item != map1_selection], index=0)
+    else:
+        map2_selection = st.sidebar.selectbox('Select socioeconomic factor for Map 2', socioeconomic_factors)
 
-    elif initial_choice == 'Categories of causes of deaths comparison':
-        st.sidebar.write('Select categories to compare:')
-        category_1 = st.sidebar.selectbox('Select first category', categories, index=0)
-        category_2 = st.sidebar.selectbox('Select second category', categories, index=1)
-        st.write(f'You chose to compare categories: {category_1} and {category_2}')
-        title_1 = f"Number of deaths in {category_1} in {year}"
-        title_2 = f"Number of deaths in {category_2} in {year}"
-        field_1, field_2 = category_1, category_2
-
-    elif initial_choice == 'Cause of deaths vs socioeconomic factor comparison':
-        st.sidebar.write('Select cause of death and socioeconomic factor to compare:')
-        cause = st.sidebar.selectbox('Select cause of death', causes)
-        socioeconomic_factor = st.sidebar.selectbox('Select socioeconomic factor', socioeconomic_factors)
-        st.write(f'You chose to compare: {cause} with {socioeconomic_factor}')
-        title_1 = f"{cause} Deaths vs Socioeconomic Factor in {year}"
-        title_2 = f"Socioeconomic Factor in {year}"
-        field_1, field_2 = cause, socioeconomic_factor
-
-    elif initial_choice == 'Category of causes of deaths vs socioeconomic factor comparison':
-        st.sidebar.write('Select category and socioeconomic factor to compare:')
-        category = st.sidebar.selectbox('Select category', categories)
-        socioeconomic_factor = st.sidebar.selectbox('Select socioeconomic factor', socioeconomic_factors)
-        st.write(f'You chose to compare category: {category} with {socioeconomic_factor}')
-        title_1 = f"{category} Deaths vs Socioeconomic Factor in {year}"
-        title_2 = f"Socioeconomic Factor in {year}"
-        field_1, field_2 = category, socioeconomic_factor
+    field_1, field_2 = map1_selection, map2_selection
 
 ############################# Some Supporting functions for plots #####################################
-
-# Choosing color schema
-color_schemes = ['oranges', 'blues', 'greens', 'reds', 'purples', 'viridis', 'plasma', 'inferno']
 
 # Defining filtered data
 if selected_countries == list(merged_df['Country Name'].unique()):
@@ -231,39 +143,32 @@ if selected_countries == list(merged_df['Country Name'].unique()):
 else:
     merged_df_selected = merged_df[(merged_df['year'] == year) & (merged_df['Country Name'].isin(selected_countries))][['Country Name', 'year', 'Country Code', field_1, field_2]]
 
-#def clean_column_name(name):
-#    return name.replace("'", "").replace(" ", "_")  # Remove apostrophes and replace spaces with underscores
-
-# Cleaning field_1 and field_2
-#field_1 = clean_column_name(field_1)
-#field_2 = clean_column_name(field_2)
-
-# Renaming columns in the merged df
-#merged_df_selected = merged_df_selected.rename(columns=lambda x: clean_column_name(x))
-
-# st.write("Filtered Table based on selections:")
-# st.write(merged_df_selected)
-
 # Function for projection creation
 def get_projection(region):
     region_settings = regions.get(region, regions['World'])
-    return ['mercator', region_settings['scale'], region_settings['center']]
+    return ['equirectangular', region_settings['scale'], region_settings['center']]
 
 # Defining background
 background = alt.Chart(source).mark_geoshape(fill='#aaa', stroke='black').properties(
     width=width, height=height).project(type=get_projection(selected_region)[0], 
     scale=get_projection(selected_region)[1], center=get_projection(selected_region)[2])
 
-selector = alt.selection_point(fields=['id'], on='click', clear='dblclick')
-
 chart_base = alt.Chart(source).properties(width=width, height=height).project(
     type=get_projection(selected_region)[0], 
     scale=get_projection(selected_region)[1], 
-    center=get_projection(selected_region)[2]).add_selection(selector).transform_lookup(
+    center=get_projection(selected_region)[2]).transform_lookup(
     lookup='id',
     from_=alt.LookupData(merged_df_selected, 'Country Code', ['Country Name', 'year', field_1, field_2]))
 
 ############################# Actual Maps and Chart functions ######################################
+title_1 = f"Number of deaths caused by {map1_selection} in {year}"
+if second_map_radio == 'Individual cause of death or category':
+    title_2 = f"Number of deaths caused by {map2_selection} in {year}"
+    tooltip_title = f"{map2_selection} Deaths per 100,000"
+else:
+    title_2 = f"Socioeconomic Factor: {map2_selection} in {year}"
+    tooltip_title = f"{map2_selection}"
+
 # First map
 rate_scale_1 = alt.Scale(domain=[merged_df_selected[field_1].min(), merged_df_selected[field_1].max()], scheme='oranges')
 rate_color_1 = alt.Color(field=field_1, type='quantitative', scale=rate_scale_1)
@@ -272,10 +177,10 @@ chart_1 = chart_base.mark_geoshape().encode(
     color=rate_color_1,
     tooltip=[
         alt.Tooltip(f'{field_1}:Q', title=f'{field_1} Deaths per 100,000'),
-        alt.Tooltip('Country Name:N', title='Country:')
+        alt.Tooltip('Country Name:N', title='Country')
 
     ]
-).transform_filter(selector).properties(title=title_1)
+).properties(title={'text': title_1})
 
 # Second map
 rate_scale_2 = alt.Scale(domain=[merged_df_selected[field_2].min(), merged_df_selected[field_2].max()], scheme='blues')
@@ -284,10 +189,10 @@ rate_color_2 = alt.Color(field=field_2, type='quantitative', scale=rate_scale_2)
 chart_2 = chart_base.mark_geoshape().encode(
     color=rate_color_2,
     tooltip=[
-        alt.Tooltip(f'{field_2}:Q', title=f'{field_2} Deaths per 100,000'),
-        alt.Tooltip('Country Name:N', title='Country:')
+        alt.Tooltip(f'{field_2}:Q', title=tooltip_title),
+        alt.Tooltip('Country Name:N', title='Country')
     ]
-).transform_filter(selector).properties(title=title_2)
+).properties(title={'text': title_2})
 
 cola, colb = st.columns(2)
 
@@ -301,19 +206,17 @@ with cola:
         rate_color_1 = alt.Color(field=field_1, type='quantitative', scale=rate_scale_1, legend=alt.Legend(title="Rate"))
         # Redraw first map with the selected color scheme
         chart_1 = chart_base.mark_geoshape().encode(
-        color=rate_color_1,
-        tooltip=[
-            alt.Tooltip(f'{field_1}:Q', title=f'{field_1} Deaths per 100,000'),
-            alt.Tooltip('Country Name:N', title='Country:')
-        ]
-        ).transform_filter(selector).properties(title=f'Number y {field_1} in {year}')
+            color=rate_color_1,
+            tooltip=[
+                alt.Tooltip(f'{field_1}:Q', title=f'{field_1} Deaths per 100,000'),
+                alt.Tooltip('Country Name:N', title='Country')
+            ]
+        ).properties(title={'text': title_1})
     with col1:
         st.altair_chart(background + chart_1, use_container_width=True)
 
 with colb:
-
     col3, spacer2, col4 = st.columns([24, 0.5, 1])
-
     with col4:
         with st.sidebar:
             color_scheme_2 = st.selectbox("Color Scheme for Map 2", color_schemes, index=1)
@@ -322,18 +225,15 @@ with colb:
         rate_color_2 = alt.Color(field=field_2, type='quantitative', scale=rate_scale_2, legend=alt.Legend(title="Rate"))
         # Redraw second map with the selected color scheme
         chart_2 = chart_base.mark_geoshape().encode(
-        color=rate_color_2,
-        tooltip=[
-            alt.Tooltip(f'{field_2}:Q', title=f'Deaths per 100,000'),
-            alt.Tooltip('Country Name:N', title='Country:')
-        ]
-        ).transform_filter(selector).properties(title=f'Number  {field_2} in {year}')
-
+            color=rate_color_2,
+            tooltip=[
+                alt.Tooltip(f'{field_2}:Q', title=tooltip_title),
+                alt.Tooltip('Country Name:N', title='Country')
+            ]       
+        ).properties(title={'text': title_2})
 
     with col3:
         st.altair_chart(background + chart_2, use_container_width=True)
-
-
 
 ############################# Line Chart & Donut Chart ##################################################
 colc, cold = st.columns([20, 10])
@@ -351,7 +251,6 @@ if selected_countries == list(merged_df['Country Name'].unique()):
     merged_df_selected['Country Name'] = merged_df_selected['Continent']
 else:
     merged_df_selected = merged_df[merged_df['Country Name'].isin(selected_countries)][['Country Name', 'year', 'Country Code', field_1, field_2]]
-    
 
 
 # Sample data and data type assignment (Current Data or Prediction)
