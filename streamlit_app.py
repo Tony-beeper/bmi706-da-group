@@ -104,7 +104,7 @@ source = alt.topo_feature(data.world_110m.url, 'countries')
 
 # Defining basic parameters
 width = 100000
-height  = 800
+height  = 500
 project = 'equirectangular'
 
 
@@ -292,12 +292,13 @@ chart_2 = chart_base.mark_geoshape().encode(
 cola, colb = st.columns(2)
 
 with cola:
-    col1, spacer1, col2 = st.columns([20, 0.1, 5])
+    col1, spacer1, col2 = st.columns([24, 0.1, 1])
     with col2:
-        color_scheme_1 = st.selectbox("Color Scheme for Map 1", color_schemes, index=0)
+        with st.sidebar:
+            color_scheme_1 = st.selectbox("Color Scheme for Map 1", color_schemes, index=0)
         # Update color scheme
         rate_scale_1 = alt.Scale(domain=[merged_df[field_1].min(), merged_df[field_1].max()], scheme=color_scheme_1)
-        rate_color_1 = alt.Color(field=field_1, type='quantitative', scale=rate_scale_1, legend=alt.Legend(title="Deaths per 100,000"))
+        rate_color_1 = alt.Color(field=field_1, type='quantitative', scale=rate_scale_1, legend=alt.Legend(title="Rate"))
         # Redraw first map with the selected color scheme
         chart_1 = chart_base.mark_geoshape().encode(
         color=rate_color_1,
@@ -305,27 +306,28 @@ with cola:
             alt.Tooltip(f'{field_1}:Q', title=f'{field_1} Deaths per 100,000'),
             alt.Tooltip('Country Name:N', title='Country:')
         ]
-        ).transform_filter(selector).properties(title=f'Number of deaths per 100,000 caused by {field_1} in {year}')
+        ).transform_filter(selector).properties(title=f'Number y {field_1} in {year}')
     with col1:
         st.altair_chart(background + chart_1, use_container_width=True)
 
 with colb:
 
-    col3, spacer2, col4 = st.columns([20, 0.5, 5])
+    col3, spacer2, col4 = st.columns([24, 0.5, 1])
 
     with col4:
-        color_scheme_2 = st.selectbox("Color Scheme for Map 2", color_schemes, index=1)
+        with st.sidebar:
+            color_scheme_2 = st.selectbox("Color Scheme for Map 2", color_schemes, index=1)
         # Update color scheme
         rate_scale_2 = alt.Scale(domain=[merged_df[field_2].min(), merged_df[field_2].max()], scheme=color_scheme_2)
-        rate_color_2 = alt.Color(field=field_2, type='quantitative', scale=rate_scale_2, legend=alt.Legend(title="Deaths per 100,000"))
+        rate_color_2 = alt.Color(field=field_2, type='quantitative', scale=rate_scale_2, legend=alt.Legend(title="Rate"))
         # Redraw second map with the selected color scheme
         chart_2 = chart_base.mark_geoshape().encode(
         color=rate_color_2,
         tooltip=[
-            alt.Tooltip(f'{field_2}:Q', title=f'{field_2} Deaths per 100,000'),
+            alt.Tooltip(f'{field_2}:Q', title=f'Deaths per 100,000'),
             alt.Tooltip('Country Name:N', title='Country:')
         ]
-        ).transform_filter(selector).properties(title=f'Number of deaths per 100,000 caused by {field_2} in {year}')
+        ).transform_filter(selector).properties(title=f'Number  {field_2} in {year}')
 
 
     with col3:
