@@ -66,7 +66,7 @@ width = 1000
 height  = 500
 project = 'equirectangular'
 
-# Mapping regoins
+# Mapping regions
 regions = {
     'World': {'center': [0, -30], 'scale': 90},
     'Africa': {'center': [15, -5], 'scale': 300},
@@ -114,11 +114,11 @@ with st.sidebar:
         selected_countries = list(selected_countries)
 
     # Select color schema
-    color_schemes = ['viridis', 'plasma', 'inferno', 'oranges', 'blues', 'greens', 'reds', 'purples']
+    color_schemes = ['viridis', 'cividis', 'plasma', 'inferno', 'magma']
 
     # Select options for the first map
     st.sidebar.write('Map 1 selection:')
-    map1_selection = st.sidebar.selectbox('Select cause of death or category for Map 1', categories + causes, index=0)
+    map1_selection = st.sidebar.selectbox('Select cause of death or category for Map 1', categories + causes, index=7)
     st.write(f'You chose to compare for Map 1: {map1_selection}')
     color_scheme_1 = st.selectbox('Color Scheme for Map 1', color_schemes, index=0)
 
@@ -128,10 +128,10 @@ with st.sidebar:
     map2_selection = 'Drowning'   
     if second_map_radio == 'Individual cause of death or category':
         cat_and_causes = categories + causes
-        map2_selection = st.sidebar.selectbox('Select cause of death or category for Map 2', [item for item in cat_and_causes if item != map1_selection], index=0)
+        map2_selection = st.sidebar.selectbox('Select cause of death or category for Map 2', [item for item in cat_and_causes if item != map1_selection], index=10)
     else:
         map2_selection = st.sidebar.selectbox('Select socioeconomic factor for Map 2', socioeconomic_factors)
-    color_scheme_2 = st.selectbox('Color Scheme for Map 2', color_schemes, index=1)
+    color_scheme_2 = st.selectbox('Color Scheme for Map 2', color_schemes, index=0)
 
     field_1, field_2 = map1_selection, map2_selection
 
@@ -161,16 +161,16 @@ chart_base = alt.Chart(source).properties(width=width, height=height).project(
     from_=alt.LookupData(merged_df_selected, 'Country Code', ['Country Name', 'year', field_1, field_2]))
 
 ######################################################## Maps ###############################################################
-title_1 = f"Number of deaths caused by {map1_selection} in {year}"
+title_1 = ["Number of deaths per 100,000", f"{map1_selection} in {year}"]
 if second_map_radio == 'Individual cause of death or category':
-    title_2 = f"Number of deaths caused by {map2_selection} in {year}"
+    title_2 = ["Number of deaths per 100,000", f"{map2_selection} in {year}"]
     tooltip_title = f"{map2_selection} Deaths per 100,000"
 else:
-    title_2 = f"Socioeconomic Factor: {map2_selection} in {year}"
+    title_2 = ["Socioeconomic factor:", f"{map2_selection} in {year}"]
     tooltip_title = f"{map2_selection}"
 
 # First map
-rate_scale_1 = alt.Scale(domain=[merged_df_selected[field_1].min(), merged_df_selected[field_1].max()], scheme=color_schemes[0])
+rate_scale_1 = alt.Scale(domain=[merged_df_selected[field_1].min(), merged_df_selected[field_1].max()], scheme=color_scheme_1)
 rate_color_1 = alt.Color(field=field_1, type='quantitative', scale=rate_scale_1)
 
 chart_1 = chart_base.mark_geoshape().encode(
@@ -183,7 +183,7 @@ chart_1 = chart_base.mark_geoshape().encode(
 ).properties(title={'text': title_1})
 
 # Second map
-rate_scale_2 = alt.Scale(domain=[merged_df_selected[field_2].min(), merged_df_selected[field_2].max()], scheme=color_schemes[1])
+rate_scale_2 = alt.Scale(domain=[merged_df_selected[field_2].min(), merged_df_selected[field_2].max()], scheme=color_scheme_2)
 rate_color_2 = alt.Color(field=field_2, type='quantitative', scale=rate_scale_2)
 
 chart_2 = chart_base.mark_geoshape().encode(
@@ -253,7 +253,7 @@ with colb:
         st.altair_chart(background + chart_2, use_container_width=True)
 
 ############################# Line Chart & Donut Chart ##################################################
-colc, cold = st.columns([20, 10])
+colc, cold = st.columns([15, 10])
 
 if selected_countries == list(merged_df['Country Name'].unique()):
     merged_df_selected = merged_df[['Country Name', 'year', 'Country Code', 'Total_Population', field_1, field_2]]
@@ -357,41 +357,8 @@ donut_chart = alt.Chart(top_causes).mark_arc(innerRadius=50, outerRadius=110).en
         'anchor': 'start'      # Align the title to the left
     }
 
-    # title=alt.TitleParams(
-    #     text=f'Category-wise distribution of deaths per 100,000 for selected countries in {year}',  # Setting the title text
-    #     fontSize=19,
-    #     font='Montserrat',  # Optionally set a custom font
-    #     anchor='start',  # Align title to the left
-    # )
 )
 
-
-
 with cold:
-    # # Display the title separately
-    # # Add the div with a specific ID to apply custom styles
-    # st.markdown(f"""
-    #     <div id='custom-title'>
-    #         <p style='font-size:19px; margin-top: 0px;'>Category-wise distribution of deaths per 100,000 for selected countries in {year}</p>
-    #     </div>
-    #     """, unsafe_allow_html=True)
-
-    # # Apply custom CSS specifically for the custom-title
-    # st.markdown(
-    #     """
-    #     <style>
-    #     #custom-title p {
-    #         font-size: 19px !important; 
-    #         margin-top: 0px !important; 
-    #     }
-    #     </style>
-    #     """, 
-    #     unsafe_allow_html=True
-    # )
-        
-    # # Add some empty space between the title and the chart
-    # st.write("")  # Add as many st.write("") as needed for spacing
-    # st.write("")  # Add as many st.write("") as needed for spacing
-    # st.write("")  # Add as many st.write("") as needed for spacing
-    # Display the chart below the title
+   
     st.altair_chart(donut_chart, use_container_width=True)
