@@ -58,16 +58,16 @@ source = alt.topo_feature(data.world_110m.url, 'countries')
 
 # Defining basic parameters
 width = 1000
-height  = 400
+height  = 500
 project = 'equirectangular'
 
 
 # Mapping regoins
 regions = {
-    'World': {'center': [0, 50], 'scale': 80},
-    'Africa': {'center': [15, -15], 'scale': 300},
-    'Europe': {'center': [10, 71], 'scale': 300},
-    'Asia': {'center': [100, 50], 'scale': 280},
+    'World': {'center': [0, -30], 'scale': 90},
+    'Africa': {'center': [15, -5], 'scale': 300},
+    'Europe': {'center': [10, 51], 'scale': 450},
+    'Asia': {'center': [100, 40], 'scale': 260},
     'North America': {'center': [-110, 50], 'scale': 250},
     'South America': {'center': [-60, -30], 'scale': 300},
     'Australia': {'center': [140, -40], 'scale': 450}
@@ -203,7 +203,11 @@ with cola:
             color_scheme_1 = st.selectbox("Color Scheme for Map 1", color_schemes, index=0)
         # Update color scheme
         rate_scale_1 = alt.Scale(domain=[merged_df[field_1].min(), merged_df[field_1].max()], scheme=color_scheme_1)
-        rate_color_1 = alt.Color(field=field_1, type='quantitative', scale=rate_scale_1, legend=alt.Legend(title="Rate"))
+        rate_color_1 = alt.Color(field=field_1, type='quantitative', scale=rate_scale_1, legend=alt.Legend(title="Rate",titleFontSize=10,         # Smaller title font
+            labelFontSize=8,          # Smaller label font
+            gradientLength=150,       # Shorter gradient bar
+            gradientThickness=8,      # Thinner gradient bar
+            orient='bottom-right' ))
         # Redraw first map with the selected color scheme
         chart_1 = chart_base.mark_geoshape().encode(
             color=rate_color_1,
@@ -211,7 +215,12 @@ with cola:
                 alt.Tooltip(f'{field_1}:Q', title=f'{field_1} Deaths per 100,000'),
                 alt.Tooltip('Country Name:N', title='Country')
             ]
-        ).properties(title={'text': title_1})
+        ).properties( title=alt.TitleParams(
+        text=title_1,
+        fontSize=18,
+        anchor='start',  # Align title to the left
+        offset=0  # Reduce space between title and map
+    ),)
     with col1:
         st.altair_chart(background + chart_1, use_container_width=True)
 
@@ -222,7 +231,11 @@ with colb:
             color_scheme_2 = st.selectbox("Color Scheme for Map 2", color_schemes, index=1)
         # Update color scheme
         rate_scale_2 = alt.Scale(domain=[merged_df[field_2].min(), merged_df[field_2].max()], scheme=color_scheme_2)
-        rate_color_2 = alt.Color(field=field_2, type='quantitative', scale=rate_scale_2, legend=alt.Legend(title="Rate"))
+        rate_color_2 = alt.Color(field=field_2, type='quantitative', scale=rate_scale_2, legend=alt.Legend(title="Rate",titleFontSize=10,         # Smaller title font
+            labelFontSize=8,          # Smaller label font
+            gradientLength=150,       # Shorter gradient bar
+            gradientThickness=8,      # Thinner gradient bar
+            orient='bottom-right' ))
         # Redraw second map with the selected color scheme
         chart_2 = chart_base.mark_geoshape().encode(
             color=rate_color_2,
