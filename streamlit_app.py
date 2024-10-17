@@ -324,7 +324,6 @@ final_chart = alt.hconcat(legend_chart,line_chart)
 # Display the final chart
 with colc:
     st.altair_chart(final_chart, use_container_width=True)
-
 # Donut Chart
 # Filter data for the selected countries
 country_data = merged_df[merged_df['Country Name'].isin(selected_countries)]
@@ -339,26 +338,29 @@ numeric_data = numeric_data[categories]*100000/numeric_data['Total_Population']
 top_causes = numeric_data.sort_values(ascending=False).head(7).reset_index()
 top_causes.columns = ['Cause', 'Deaths']
 
+# Calculate percentage for each cause of death
+top_causes['Percentage'] = top_causes['Deaths'] / top_causes['Deaths'].sum() * 100
 
 # Create the donut chart
 donut_chart = alt.Chart(top_causes).mark_arc(innerRadius=50, outerRadius=110).encode(
     theta=alt.Theta(field='Deaths', type='quantitative'),
     color=alt.Color(field='Cause', type='nominal', title='Category'),
-    tooltip=[alt.Tooltip('Cause:N', title='Category'), alt.Tooltip('Deaths:Q', title='Deaths per 100,000')]
+    tooltip=[
+        alt.Tooltip('Cause:N', title='Category'),
+        alt.Tooltip('Deaths:Q', title='Deaths per 100,000'),
+        alt.Tooltip('Percentage:Q', title='Percentage', format='.2f')  # Add percentage to tooltip
+    ]
 ).properties(
     title={
         'text': [
             f'Category-wise distribution of deaths per 100,000',
             f'for selected countries in {year}'
-
         ],
         'fontSize': 19,  # Set the title font size to 19
         'font': 'Montserrat',  # Set the custom font to Montserrat
         'anchor': 'start'      # Align the title to the left
     }
-
 )
 
 with cold:
-   
     st.altair_chart(donut_chart, use_container_width=True)
