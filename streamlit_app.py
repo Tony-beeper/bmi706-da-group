@@ -316,7 +316,7 @@ with colb:
     with col4:
         color_scheme_2 = st.selectbox("Color Scheme for Map 2", color_schemes, index=1)
         # Update color scheme
-        rate_scale_2 = alt.Scale(domain=[merged_df_selected[field_2].min(), merged_df_selected[field_2].max()], scheme=color_scheme_2)
+        rate_scale_2 = alt.Scale(domain=[merged_df[field_2].min(), merged_df[field_2].max()], scheme=color_scheme_2)
         rate_color_2 = alt.Color(field=field_2, type='quantitative', scale=rate_scale_2, legend=alt.Legend(title="Deaths per 100,000"))
         # Redraw second map with the selected color scheme
         chart_2 = chart_base.mark_geoshape().encode(
