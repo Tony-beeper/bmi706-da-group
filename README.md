@@ -1,9 +1,5 @@
 # BMI 706 Data Visualization App
 
-**Contributors:**  
-Tanush Kumar, Jurijs Alehins, Youxin Tan
-
-
 
 ## To Run locally:
 
