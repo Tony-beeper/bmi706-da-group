@@ -1,6 +1,6 @@
-# BMI 706 Data Visualization App by
-Jurijs A
-Tanush K
+# BMI 706 Data Visualization App
+Jurijs A \
+Tanush K \
 Youxin T
 
 ## To Run locally:
